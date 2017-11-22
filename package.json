@@ -16,7 +16,7 @@
   "homepage":
     "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
   "engines": {
-    "node": "^6.10.0"
+    "node": ">=6.5.0"
   },
   "categories": ["Languages", "Snippets", "Other"],
   "keywords": ["yuml", "uml", "diagrams"],
