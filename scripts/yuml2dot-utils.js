@@ -148,25 +148,25 @@ const serializeDotElements = function(arr) {
 
   for (let record of arr) {
     if (record.length === 2)
-      dot += `    ${record[0]} ${serializeDot(record[1])}\r\n`;
+      dot += `    ${record[0]} ${serializeDot(record[1])}\n`;
     else if (record.length === 3)
-      dot += `    ${record[0]} -> ${record[1]} ${serializeDot(record[2])}\r\n`;
+      dot += `    ${record[0]} -> ${record[1]} ${serializeDot(record[2])}\n`;
   }
 
   return dot;
 };
 
 const buildDotHeader = function(isDark) {
-  let header = "digraph G {\r\n";
+  let header = "digraph G {\n";
 
   if (isDark) {
-    header += "  graph [ bgcolor=transparent, fontname=Helvetica ]\r\n";
-    header += "  node [ color=white, fontcolor=white, fontname=Helvetica ]\r\n";
-    header += "  edge [ color=white, fontcolor=white, fontname=Helvetica ]\r\n";
+    header += "  graph [ bgcolor=transparent, fontname=Helvetica ]\n";
+    header += "  node [ color=white, fontcolor=white, fontname=Helvetica ]\n";
+    header += "  edge [ color=white, fontcolor=white, fontname=Helvetica ]\n";
   } else {
-    header += "  graph [ fontname=Helvetica ]\r\n";
-    header += "  node [ fontname=Helvetica ]\r\n";
-    header += "  edge [ fontname=Helvetica ]\r\n";
+    header += "  graph [ fontname=Helvetica ]\n";
+    header += "  node [ fontname=Helvetica ]\n";
+    header += "  edge [ fontname=Helvetica ]\n";
   }
   return header;
 };

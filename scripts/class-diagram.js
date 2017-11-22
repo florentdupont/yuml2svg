@@ -6,6 +6,8 @@ const {
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
 
+const RANKSEP = 0.7;
+
 /*
 Syntax as specified in yuml.me
 
@@ -108,8 +110,8 @@ function composeDotExpr(specLines, options) {
   let uid;
   const uids = {};
   let len = 0;
-  let dot = "    ranksep = " + 0.7 + "\r\n";
-  dot += "    rankdir = " + options.dir + "\r\n";
+  let dot = `    ranksep = ${RANKSEP}\n`;
+  dot += "    rankdir = " + options.dir + "\n";
 
   for (let i = 0; i < specLines.length; i++) {
     const elem = parseYumlExpr(specLines[i]);
@@ -142,7 +144,7 @@ function composeDotExpr(specLines, options) {
 
         if (elem[k][3]) node.fontcolor = elem[k][3];
 
-        dot += "    " + uid + " " + serializeDot(node) + "\r\n";
+        dot += "    " + uid + " " + serializeDot(node) + "\n";
       }
     }
 
@@ -170,7 +172,7 @@ function composeDotExpr(specLines, options) {
           uids[recordName(elem[2][1])] +
           " " +
           serializeDot(edge) +
-          ";}\r\n";
+          ";}\n";
       else
         dot +=
           "    " +
@@ -179,7 +181,7 @@ function composeDotExpr(specLines, options) {
           uids[recordName(elem[2][1])] +
           " " +
           serializeDot(edge) +
-          "\r\n";
+          "\n";
     } else if (
       elem.length === 4 &&
       elem[0][0] === "record" &&
@@ -198,7 +200,7 @@ function composeDotExpr(specLines, options) {
         width: 0.01,
       };
       uid = uids[recordName(elem[0][1])] + "J" + uids[recordName(elem[2][1])];
-      dot += "    " + uid + " " + serializeDot(junction) + "\r\n";
+      dot += "    " + uid + " " + serializeDot(junction) + "\n";
 
       const edge1 = {
         shape: "edge",
@@ -235,7 +237,7 @@ function composeDotExpr(specLines, options) {
         uid +
         " " +
         serializeDot(edge1) +
-        "\r\n";
+        "\n";
       dot +=
         "    " +
         uid +
@@ -243,7 +245,7 @@ function composeDotExpr(specLines, options) {
         uids[recordName(elem[2][1])] +
         " " +
         serializeDot(edge2) +
-        "\r\n";
+        "\n";
       dot +=
         "    { rank=same; " +
         uids[recordName(elem[3][1])] +
@@ -251,12 +253,12 @@ function composeDotExpr(specLines, options) {
         uid +
         " " +
         serializeDot(edge3) +
-        ";}\r\n";
-      //dot += '    ' + uids[recordName(elem[0][1])] + " -> "  + uids[recordName(elem[2][1])] + " [color=red]\r\n";
+        ";}\n";
+      //dot += '    ' + uids[recordName(elem[0][1])] + " -> "  + uids[recordName(elem[2][1])] + " [color=red]\n";
     }
   }
 
-  dot += "}\r\n";
+  dot += "}\n";
   return dot;
 }
 

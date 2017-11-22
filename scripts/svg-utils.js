@@ -45,7 +45,7 @@ module.exports = function(svg, isDark) {
         (isDark ? "white" : "black") +
         ';stroke-width:1px">' +
         img[0] +
-        "</g>\r\n" +
+        "</g>\n" +
         text
       );
     } catch (e) {

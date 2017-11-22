@@ -6,6 +6,8 @@ const {
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
 
+const RANKSEP = 0.5;
+
 /*
 Unofficial syntax, based on the activity diagram syntax specified in yuml.me
 
@@ -52,8 +54,8 @@ function composeDotExpr(specLines, options) {
   let node;
   const uids = {};
   let len = 0;
-  let dot = "    ranksep = " + 0.5 + "\r\n";
-  dot += "    rankdir = " + options.dir + "\r\n";
+  let dot = `    ranksep = ${RANKSEP}\n`;
+  dot += "    rankdir = " + options.dir + "\n";
 
   for (let i = 0; i < specLines.length; i++) {
     const elem = parseYumlExpr(specLines[i]);
@@ -97,7 +99,7 @@ function composeDotExpr(specLines, options) {
           if (elem[k][3]) node.fontcolor = elem[k][3];
         }
 
-        dot += "    " + uid + " " + serializeDot(node) + "\r\n";
+        dot += "    " + uid + " " + serializeDot(node) + "\n";
       }
     }
 
@@ -131,12 +133,12 @@ function composeDotExpr(specLines, options) {
           uids[recordName(elem[k + 1][1])] +
           " " +
           serializeDot(edge) +
-          "\r\n";
+          "\n";
       }
     }
   }
 
-  dot += "}\r\n";
+  dot += "}\n";
   return dot;
 }
 

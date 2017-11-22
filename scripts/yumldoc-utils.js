@@ -1,4 +1,5 @@
 const fs = require("fs");
+const Viz = require("viz.js");
 
 const classDiagram = require("./class-diagram.js");
 const usecaseDiagram = require("./usecase-diagram.js");
@@ -6,7 +7,6 @@ const activityDiagram = require("./activity-diagram.js");
 const stateDiagram = require("./state-diagram.js");
 const deploymentDiagram = require("./deployment-diagram.js");
 const packageDiagram = require("./package-diagram.js");
-const Viz = require("viz.js");
 const processEmbeddedImages = require("./svg-utils.js");
 const { buildDotHeader } = require("./yuml2dot-utils");
 
@@ -80,11 +80,11 @@ const processYumlDocument = function(text, filename, mayGenerate) {
   }
 
   return svgLight;
-  // "<div id='light'>\r\n" +
+  // "<div id='light'>\n" +
   // svgLight +
-  // "\r\n</div><div id='dark'>\r\n" +
+  // "\n</div><div id='dark'>\n" +
   // svgDark +
-  // "\r\n</div>"
+  // "\n</div>"
 };
 
 let processDirectives = function(line, options) {

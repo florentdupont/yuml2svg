@@ -6,6 +6,8 @@ const {
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
 
+const RANKSEP = 0.5;
+
 /*
 Syntax as specified in yuml.me
 
@@ -180,10 +182,10 @@ function composeDotExpr(specLines, options) {
     }
   }
 
-  let dot = "    ranksep = " + 0.5 + "\r\n";
-  dot += "    rankdir = " + options.dir + "\r\n";
+  let dot = `    ranksep = ${RANKSEP}\n`;
+  dot += "    rankdir = " + options.dir + "\n";
   dot += serializeDotElements(elements);
-  dot += "}\r\n";
+  dot += "}\n";
   return dot;
 }
 
