@@ -1,6 +1,4 @@
-const fs = require("fs");
-
-let colorTable = null;
+const Color = require("color");
 
 const escape_label = function(label) {
   let newlabel = "";
@@ -81,7 +79,9 @@ const extractBgAndNote = function(part, allowNote) {
     const luma = getLuma(ret.bg);
     if (luma < 64) ret.fontcolor = "white";
     else if (luma > 192) ret.fontcolor = "black";
-  } else ret.part = part.trim();
+  } else {
+    ret.part = part.trim();
+  }
 
   if (allowNote && part.startsWith("note:")) {
     ret.part = ret.part.substring(5).trim();
@@ -148,16 +148,9 @@ const serializeDotElements = function(arr) {
 
   for (let record of arr) {
     if (record.length === 2)
-      dot += "    " + record[0] + " " + serializeDot(record[1]) + "\r\n";
+      dot += `    ${record[0]} ${serializeDot(record[1])}\r\n`;
     else if (record.length === 3)
-      dot +=
-        "    " +
-        record[0] +
-        " -> " +
-        record[1] +
-        " " +
-        serializeDot(record[2]) +
-        "\r\n";
+      dot += `    ${record[0]} -> ${record[1]} ${serializeDot(record[2])}\r\n`;
   }
 
   return dot;
@@ -178,42 +171,7 @@ const buildDotHeader = function(isDark) {
   return header;
 };
 
-let loadColors = function() {
-  if (colorTable !== null) return;
-  else colorTable = {};
-
-  const rgb = fs
-    .readFileSync(__dirname + "/../data/rgb.txt", {
-      encoding: "utf8",
-      flag: "r",
-    })
-    .split("\n");
-  for (let i = 0; i < rgb.length; i++) {
-    const parts = /^(\d+) (\d+) (\d+) (.*)$/.exec(rgb[i]);
-
-    if (parts !== null && parts.length === 5 && parts[4].indexOf(" ") < 0) {
-      const luma =
-        0.2126 * parseFloat(parts[0]) +
-        0.7152 * parseFloat(parts[1]) +
-        0.0722 * parseFloat(parts[2]);
-      colorTable[parts[4].toLowerCase()] = luma;
-    }
-  }
-};
-
-let getLuma = function(color) {
-  loadColors();
-  let luma = 128;
-
-  if (color.startsWith("#"))
-    luma =
-      0.2126 * parseInt(color.substr(1, 2), 16) +
-      0.7152 * parseInt(color.substr(3, 2), 16) +
-      0.0722 * parseInt(color.substr(5, 2), 16);
-  else if (colorTable.hasOwnProperty(color)) luma = colorTable[color];
-
-  return luma;
-};
+let getLuma = color => Color(color).luminosity() * 128;
 
 module.exports = {
   buildDotHeader,

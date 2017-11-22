@@ -20,56 +20,16 @@
   },
   "categories": ["Languages", "Snippets", "Other"],
   "keywords": ["yuml", "uml", "diagrams"],
-  "contributes": {
-    "languages": [
-      {
-        "id": "yuml",
-        "aliases": ["yUML", "yuml"],
-        "extensions": [".yuml"],
-        "configuration": "./yuml.configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "yuml",
-        "scopeName": "source.yuml",
-        "path": "./syntaxes/yuml.tmLanguage"
-      }
-    ],
-    "commands": [
-      {
-        "command": "extension.viewYumlDiagram",
-        "title": "View yUML Diagram",
-        "icon": {
-          "light": "./images/preview.svg",
-          "dark": "./images/preview_inverse.svg"
-        }
-      }
-    ],
-    "menus": {
-      "editor/title": [
-        {
-          "when": "resourceLangId == yuml",
-          "command": "extension.viewYumlDiagram",
-          "group": "navigation"
-        }
-      ]
-    },
-    "snippets": [
-      {
-        "language": "yuml",
-        "path": "./snippets/yuml.json"
-      }
-    ]
-  },
+
   "main": "./index.js",
   "dependencies": {
+    "color": "^2.0.1",
     "viz.js": "^1.7.1"
   },
   "devDependencies": {
-    "mocha": "^2.3.3",
-    "eslint": "^3.6.0",
+    "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
+    "eslint": "^3.6.0",
+    "mocha": "^2.3.3"
   }
 }

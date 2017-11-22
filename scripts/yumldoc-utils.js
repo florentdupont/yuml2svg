@@ -74,13 +74,9 @@ const processYumlDocument = function(text, filename, mayGenerate) {
     return "Error composing the diagram";
   }
 
-  try {
-    if (options.generate === true && mayGenerate === true) {
-      const imagename = filename.replace(/\.[^.$]+$/, ".svg");
-      fs.writeFileSync(imagename, svgLight);
-    }
-  } catch (e) {
-    console.error(e);
+  if (options.generate === true && mayGenerate === true) {
+    const imagename = filename.replace(/\.[^.$]+$/, ".svg");
+    fs.writeFile(imagename, svgLight, err => err && console.error(err));
   }
 
   return svgLight;
