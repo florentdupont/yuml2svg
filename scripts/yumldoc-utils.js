@@ -56,6 +56,7 @@ const processYumlDocument = function(text, filename, mayGenerate) {
         break;
     }
   } catch (e) {
+    console.error(e);
     return "Error parsing the yUML file";
   }
 
@@ -66,9 +67,10 @@ const processYumlDocument = function(text, filename, mayGenerate) {
     svgLight = Viz(buildDotHeader(false) + dot);
     svgLight = processEmbeddedImages(svgLight, false);
 
-    svgDark = Viz(buildDotHeader(true) + dot);
-    svgDark = processEmbeddedImages(svgDark, true);
+    // svgDark = Viz(buildDotHeader(true) + dot);
+    // svgDark = processEmbeddedImages(svgDark, true);
   } catch (e) {
+    console.error(e);
     return "Error composing the diagram";
   }
 
@@ -77,15 +79,16 @@ const processYumlDocument = function(text, filename, mayGenerate) {
       const imagename = filename.replace(/\.[^.$]+$/, ".svg");
       fs.writeFileSync(imagename, svgLight);
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 
-  return (
-    "<div id='light'>\r\n" +
-    svgLight +
-    "\r\n</div><div id='dark'>\r\n" +
-    svgDark +
-    "\r\n</div>"
-  );
+  return svgLight;
+  // "<div id='light'>\r\n" +
+  // svgLight +
+  // "\r\n</div><div id='dark'>\r\n" +
+  // svgDark +
+  // "\r\n</div>"
 };
 
 let processDirectives = function(line, options) {

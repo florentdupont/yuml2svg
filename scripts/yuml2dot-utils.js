@@ -133,7 +133,7 @@ const serializeDot = function(obj) {
   return (
     Object.keys(obj)
       .reduce(
-        (key, pv) =>
+        (pv, key) =>
           `${pv} ${key} = ` +
           ("string" === typeof obj[key] ? `"${obj[key]}"` : obj[key]) +
           ",",
