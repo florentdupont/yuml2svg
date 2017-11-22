@@ -1,15 +1,9 @@
 const {
-  buildDotHeader,
-  escape_label,
-  escape_token_escapes,
   extractBgAndNote,
   formatLabel,
-  unescape_token_escapes,
   recordName,
   serializeDot,
-  serializeDotElements,
   splitYumlExpr,
-  wordwrap,
 } = require("./yuml2dot-utils.js");
 
 /*
@@ -24,17 +18,17 @@ Notes	            [Admin]^[User],[Admin]-(note: Most privilidged user)
 */
 
 function parseYumlExpr(specLine) {
-  var exprs = [];
-  var parts = this.splitYumlExpr(specLine, "[(");
+  const exprs = [];
+  const parts = splitYumlExpr(specLine, "[(");
 
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i].trim();
-    if (part.length == 0) continue;
+  for (let i = 0; i < parts.length; i++) {
+    let part = parts[i].trim();
+    if (part.length === 0) continue;
 
     if (part.match(/^\(.*\)$/)) {
       // use-case
       part = part.substr(1, part.length - 2);
-      var ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(part, true);
       exprs.push([
         ret.isNote ? "note" : "record",
         ret.part,
@@ -69,38 +63,38 @@ function parseYumlExpr(specLine) {
 }
 
 function composeDotExpr(specLines, options) {
-  var uids = {};
-  var len = 0;
-  var dot = "    ranksep = " + 0.7 + "\r\n";
+  const uids = {};
+  let len = 0;
+  let dot = "    ranksep = " + 0.7 + "\r\n";
   dot += "    rankdir = " + options.dir + "\r\n";
 
-  for (var i = 0; i < specLines.length; i++) {
-    var elem = parseYumlExpr(specLines[i]);
+  for (let i = 0; i < specLines.length; i++) {
+    const elem = parseYumlExpr(specLines[i]);
 
-    for (var k = 0; k < elem.length; k++) {
-      var type = elem[k][0];
+    for (let k = 0; k < elem.length; k++) {
+      const type = elem[k][0];
 
-      if (type == "note" || type == "record" || type == "actor") {
-        var label = elem[k][1];
+      if (type === "note" || type === "record" || type === "actor") {
+        let label = elem[k][1];
         if (uids.hasOwnProperty(recordName(label))) continue;
 
-        var uid = "A" + (len++).toString();
+        const uid = "A" + (len++).toString();
         uids[recordName(label)] = uid;
 
         label = formatLabel(label, 20, false);
 
-        var node = {
+        const node = {
           fontsize: 10,
         };
 
-        if (type == "actor") {
+        if (type === "actor") {
           node.margin = "0.05,0.05";
           node.shape = "none";
           node.label = "{img:actor} " + label;
           node.height = 1;
         } else {
           node.margin = "0.20,0.05";
-          node.shape = type == "record" ? "ellipse" : "note";
+          node.shape = type === "record" ? "ellipse" : "note";
           node.label = label;
           node.height = 0.5;
 
@@ -116,11 +110,11 @@ function composeDotExpr(specLines, options) {
       }
     }
 
-    if (elem.length == 3 && elem[1][0] == "edge") {
-      var style =
-        elem[0][0] == "note" || elem[2][0] == "note" ? "dashed" : elem[1][4];
+    if (elem.length === 3 && elem[1][0] === "edge") {
+      const style =
+        elem[0][0] === "note" || elem[2][0] === "note" ? "dashed" : elem[1][4];
 
-      var edge = {
+      const edge = {
         shape: "edge",
         dir: "both",
         style: style,

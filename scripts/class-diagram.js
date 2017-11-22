@@ -1,15 +1,9 @@
 const {
-  buildDotHeader,
-  escape_label,
-  escape_token_escapes,
   extractBgAndNote,
   formatLabel,
-  unescape_token_escapes,
   recordName,
   serializeDot,
-  serializeDotElements,
   splitYumlExpr,
-  wordwrap,
 } = require("./yuml2dot-utils.js");
 
 /*
@@ -31,30 +25,30 @@ Comment       // Comments
 */
 
 function parseYumlExpr(specLine) {
-  var exprs = [];
-  var parts = this.splitYumlExpr(specLine, "[");
+  const exprs = [];
+  const parts = splitYumlExpr(specLine, "[");
 
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i].trim();
-    if (part.length == 0) continue;
+  for (let i = 0; i < parts.length; i++) {
+    let part = parts[i].trim();
+    if (part.length === 0) continue;
 
     if (part.match(/^\[.*\]$/)) {
       // class box
       part = part.substr(1, part.length - 2);
-      var ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(part, true);
       exprs.push([
         ret.isNote ? "note" : "record",
         ret.part,
         ret.bg,
         ret.fontcolor,
       ]);
-    } else if (part == "^") {
+    } else if (part === "^") {
       // inheritance
       exprs.push(["edge", "empty", "", "none", "", "solid"]);
     } else if (part.indexOf("-") >= 0) {
       // association
-      var style;
-      var tokens;
+      let style;
+      let tokens;
 
       if (part.indexOf("-.-") >= 0) {
         style = "dashed";
@@ -64,13 +58,13 @@ function parseYumlExpr(specLine) {
         tokens = part.split("-");
       }
 
-      if (tokens.length != 2) throw "Invalid expression";
+      if (tokens.length !== 2) throw "Invalid expression";
 
-      var left = tokens[0];
-      var right = tokens[1];
-      var lstyle, ltext, rstyle, rtext;
+      const left = tokens[0];
+      const right = tokens[1];
+      let lstyle, ltext, rstyle, rtext;
 
-      var processLeft = function(left) {
+      const processLeft = function(left) {
         if (left.startsWith("<>")) return ["odiamond", left.substring(2)];
         else if (left.startsWith("++")) return ["diamond", left.substring(2)];
         else if (left.startsWith("+")) return ["odiamond", left.substring(1)];
@@ -83,8 +77,8 @@ function parseYumlExpr(specLine) {
       lstyle = tokens[0];
       ltext = tokens[1];
 
-      var processRight = function(right) {
-        var len = right.length;
+      const processRight = function(right) {
+        const len = right.length;
 
         if (right.endsWith("<>"))
           return ["odiamond", right.substring(0, len - 2)];
@@ -110,28 +104,30 @@ function parseYumlExpr(specLine) {
 }
 
 function composeDotExpr(specLines, options) {
-  var uids = {};
-  var len = 0;
-  var dot = "    ranksep = " + 0.7 + "\r\n";
+  let style;
+  let uid;
+  const uids = {};
+  let len = 0;
+  let dot = "    ranksep = " + 0.7 + "\r\n";
   dot += "    rankdir = " + options.dir + "\r\n";
 
-  for (var i = 0; i < specLines.length; i++) {
-    var elem = parseYumlExpr(specLines[i]);
+  for (let i = 0; i < specLines.length; i++) {
+    const elem = parseYumlExpr(specLines[i]);
 
-    for (var k = 0; k < elem.length; k++) {
-      if (elem[k][0] == "note" || elem[k][0] == "record") {
-        var label = elem[k][1];
+    for (let k = 0; k < elem.length; k++) {
+      if (elem[k][0] === "note" || elem[k][0] === "record") {
+        let label = elem[k][1];
         if (uids.hasOwnProperty(recordName(label))) continue;
 
-        var uid = "A" + (len++).toString();
+        uid = "A" + (len++).toString();
         uids[recordName(label)] = uid;
 
         label = formatLabel(label, 20, true);
-        if (elem[k][0] == "record") {
-          if (options.dir == "TB") label = "{" + label + "}";
+        if (elem[k][0] === "record" && options.dir === "TB") {
+          label = "{" + label + "}";
         }
 
-        var node = {
+        const node = {
           shape: elem[k][0],
           height: 0.5,
           fontsize: 10,
@@ -150,11 +146,11 @@ function composeDotExpr(specLines, options) {
       }
     }
 
-    if (elem.length == 3 && elem[1][0] == "edge") {
-      var hasNote = elem[0][0] == "note" || elem[2][0] == "note";
-      var style = hasNote ? "dashed" : elem[1][5];
+    if (elem.length === 3 && elem[1][0] === "edge") {
+      const hasNote = elem[0][0] === "note" || elem[2][0] === "note";
+      style = hasNote ? "dashed" : elem[1][5];
 
-      var edge = {
+      const edge = {
         shape: "edge",
         dir: "both",
         style: style,
@@ -185,25 +181,26 @@ function composeDotExpr(specLines, options) {
           serializeDot(edge) +
           "\r\n";
     } else if (
-      elem.length == 4 &&
-      [elem[0][0], elem[1][0], elem[2][0], elem[3][0]].join() ==
-        "record,edge,record,record"
+      elem.length === 4 &&
+      elem[0][0] === "record" &&
+      elem[1][0] === "edge" &&
+      elem[2][0] === "record" &&
+      elem[3][0] === "record"
     ) {
       // intermediate association class
-      var style = elem[1][5];
+      style = elem[1][5];
 
-      var junction = {
+      const junction = {
         shape: "point",
         style: "invis",
         label: "",
         height: 0.01,
         width: 0.01,
       };
-      var uid =
-        uids[recordName(elem[0][1])] + "J" + uids[recordName(elem[2][1])];
+      uid = uids[recordName(elem[0][1])] + "J" + uids[recordName(elem[2][1])];
       dot += "    " + uid + " " + serializeDot(junction) + "\r\n";
 
-      var edge1 = {
+      const edge1 = {
         shape: "edge",
         dir: "both",
         style: style,
@@ -213,7 +210,7 @@ function composeDotExpr(specLines, options) {
         labeldistance: 2,
         fontsize: 10,
       };
-      var edge2 = {
+      const edge2 = {
         shape: "edge",
         dir: "both",
         style: style,
@@ -223,7 +220,7 @@ function composeDotExpr(specLines, options) {
         labeldistance: 2,
         fontsize: 10,
       };
-      var edge3 = {
+      const edge3 = {
         shape: "edge",
         dir: "both",
         style: "dashed",

@@ -1,15 +1,9 @@
 const {
-  buildDotHeader,
-  escape_label,
-  escape_token_escapes,
   extractBgAndNote,
   formatLabel,
-  unescape_token_escapes,
   recordName,
   serializeDot,
-  serializeDotElements,
   splitYumlExpr,
-  wordwrap,
 } = require("./yuml2dot-utils.js");
 
 /*
@@ -24,17 +18,17 @@ Complex case     (Simulator running)[Pause]->(Simulator paused|do/wait)[Unpause]
 */
 
 function parseYumlExpr(specLine) {
-  var exprs = [];
-  var parts = this.splitYumlExpr(specLine, "(");
+  const exprs = [];
+  const parts = splitYumlExpr(specLine, "(");
 
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i].trim();
-    if (part.length == 0) continue;
+  for (let i = 0; i < parts.length; i++) {
+    let part = parts[i].trim();
+    if (part.length === 0) continue;
 
     if (part.match(/^\(.*\)$/)) {
       // state
       part = part.substr(1, part.length - 2);
-      var ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(part, true);
       exprs.push([
         ret.isNote ? "note" : "record",
         ret.part,
@@ -45,7 +39,7 @@ function parseYumlExpr(specLine) {
       // arrow
       part = part.substr(0, part.length - 2).trim();
       exprs.push(["edge", "none", "vee", part, "solid"]);
-    } else if (part == "-") {
+    } else if (part === "-") {
       // connector for notes
       exprs.push(["edge", "none", "none", "", "solid"]);
     } else throw "Invalid expression";
@@ -55,27 +49,28 @@ function parseYumlExpr(specLine) {
 }
 
 function composeDotExpr(specLines, options) {
-  var uids = {};
-  var len = 0;
-  var dot = "    ranksep = " + 0.5 + "\r\n";
+  let node;
+  const uids = {};
+  let len = 0;
+  let dot = "    ranksep = " + 0.5 + "\r\n";
   dot += "    rankdir = " + options.dir + "\r\n";
 
-  for (var i = 0; i < specLines.length; i++) {
-    var elem = parseYumlExpr(specLines[i]);
+  for (let i = 0; i < specLines.length; i++) {
+    const elem = parseYumlExpr(specLines[i]);
 
-    for (var k = 0; k < elem.length; k++) {
-      var type = elem[k][0];
+    for (let k = 0; k < elem.length; k++) {
+      const type = elem[k][0];
 
-      if (type == "note" || type == "record") {
-        var label = elem[k][1];
+      if (type === "note" || type === "record") {
+        let label = elem[k][1];
         if (uids.hasOwnProperty(recordName(label))) continue;
 
-        var uid = "A" + (len++).toString();
+        const uid = "A" + (len++).toString();
         uids[recordName(label)] = uid;
 
-        if (type == "record" && (label == "start" || label == "end")) {
-          var node = {
-            shape: label == "start" ? "circle" : "doublecircle",
+        if (type === "record" && (label === "start" || label === "end")) {
+          node = {
+            shape: label === "start" ? "circle" : "doublecircle",
             height: 0.3,
             width: 0.3,
             margin: "0,0",
@@ -83,9 +78,9 @@ function composeDotExpr(specLines, options) {
           };
         } else {
           label = formatLabel(label, 20, true);
-          if (type == "record") label = "{" + label + "}";
+          if (type === "record") label = "{" + label + "}";
 
-          var node = {
+          node = {
             shape: type,
             height: 0.5,
             fontsize: 10,
@@ -106,18 +101,18 @@ function composeDotExpr(specLines, options) {
       }
     }
 
-    for (var k = 1; k < elem.length - 1; k++) {
+    for (let k = 1; k < elem.length - 1; k++) {
       if (
-        elem[k][0] == "edge" &&
-        elem[k - 1][0] != "edge" &&
-        elem[k + 1][0] != "edge"
+        elem[k][0] === "edge" &&
+        elem[k - 1][0] !== "edge" &&
+        elem[k + 1][0] !== "edge"
       ) {
-        var style =
-          elem[k - 1][0] == "note" || elem[k + 1][0] == "note"
+        const style =
+          elem[k - 1][0] === "note" || elem[k + 1][0] === "note"
             ? "dashed"
             : elem[k][4];
 
-        var edge = {
+        const edge = {
           shape: "edge",
           dir: "both",
           style: style,

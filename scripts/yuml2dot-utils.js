@@ -1,10 +1,10 @@
 const fs = require("fs");
 
-var colorTable = null;
+let colorTable = null;
 
 const escape_label = function(label) {
-  var newlabel = "";
-  for (var i = 0; i < label.length; i++)
+  let newlabel = "";
+  for (let i = 0; i < label.length; i++)
     newlabel += replaceChar(label.charAt(i));
 
   function replaceChar(c) {
@@ -20,23 +20,23 @@ const escape_label = function(label) {
 };
 
 const splitYumlExpr = function(line, separators, escape = "\\") {
-  var word = "";
-  var lastChar = null;
-  var parts = [];
+  let word = "";
+  let lastChar = null;
+  const parts = [];
 
-  for (var i = 0; i < line.length; i++) {
-    c = line[i];
+  for (let i = 0; i < line.length; i++) {
+    let currentWord = line[i];
 
-    if (c === escape && i + 1 < line.length) {
-      word += c;
+    if (currentWord === escape && i + 1 < line.length) {
+      word += currentWord;
       word += line[++i];
-    } else if (separators.indexOf(c) >= 0 && lastChar === null) {
+    } else if (separators.indexOf(currentWord) >= 0 && lastChar === null) {
       if (word.length > 0) {
         parts.push(word.trim());
         word = "";
       }
 
-      switch (c) {
+      switch (currentWord) {
         case "[":
           lastChar = "]";
           break;
@@ -53,13 +53,13 @@ const splitYumlExpr = function(line, separators, escape = "\\") {
           lastChar = null;
           break;
       }
-      word = c;
-    } else if (c === lastChar) {
+      word = currentWord;
+    } else if (currentWord === lastChar) {
       lastChar = null;
-      parts.push(word.trim() + c);
+      parts.push(word.trim() + currentWord);
       word = "";
     } else {
-      word += c;
+      word += currentWord;
     }
   }
 
@@ -69,16 +69,16 @@ const splitYumlExpr = function(line, separators, escape = "\\") {
 };
 
 const extractBgAndNote = function(part, allowNote) {
-  var ret = { bg: "", isNote: false, luma: 128 };
+  const ret = { bg: "", isNote: false, luma: 128 };
 
-  var bgParts = /^(.*)\{ *bg *: *([a-zA-Z]+\d*|#[0-9a-fA-F]{6}) *\}$/.exec(
+  const bgParts = /^(.*)\{ *bg *: *([a-zA-Z]+\d*|#[0-9a-fA-F]{6}) *\}$/.exec(
     part
   );
-  if (bgParts != null && bgParts.length == 3) {
+  if (bgParts !== null && bgParts.length === 3) {
     ret.part = bgParts[1].trim();
     ret.bg = bgParts[2].trim().toLowerCase();
 
-    var luma = getLuma(ret.bg);
+    const luma = getLuma(ret.bg);
     if (luma < 64) ret.fontcolor = "white";
     else if (luma > 192) ret.fontcolor = "black";
   } else ret.part = part.trim();
@@ -103,11 +103,11 @@ const recordName = function(label) {
 };
 
 const formatLabel = function(label, wrap, allowDivisors) {
-  var lines = [label];
+  let lines = [label];
 
   if (allowDivisors && label.indexOf("|") >= 0) lines = label.split("|");
 
-  for (var j = 0; j < lines.length; j++)
+  for (let j = 0; j < lines.length; j++)
     lines[j] = wordwrap(lines[j], wrap, "\\n");
 
   label = lines.join("|");
@@ -118,11 +118,11 @@ const formatLabel = function(label, wrap, allowDivisors) {
 const wordwrap = function(str, width, newline) {
   if (!str || str.length < width) return str;
 
-  var p;
-  for (p = width; p > 0 && str[p] != " "; p--) {}
+  let p;
+  for (p = width; p > 0 && str[p] !== " "; p--) {}
   if (p > 0) {
-    var left = str.substring(0, p);
-    var right = str.substring(p + 1);
+    const left = str.substring(0, p);
+    const right = str.substring(p + 1);
     return left + newline + wordwrap(right, width, newline);
   }
 
@@ -130,30 +130,26 @@ const wordwrap = function(str, width, newline) {
 };
 
 const serializeDot = function(obj) {
-  var text = "";
-
-  for (key in obj) {
-    if (text.length == 0) text = "[ ";
-    else text += ", ";
-
-    text += key + " = ";
-    if (typeof obj[key] === "string") text += '"' + obj[key] + '"';
-    else text += obj[key];
-  }
-
-  text += " ]";
-  return text;
+  return (
+    Object.keys(obj)
+      .reduce(
+        (key, pv) =>
+          `${pv} ${key} = ` +
+          ("string" === typeof obj[key] ? `"${obj[key]}"` : obj[key]) +
+          ",",
+        "["
+      )
+      .slice(0, -1) + " ]"
+  );
 };
 
 const serializeDotElements = function(arr) {
-  var dot = "";
+  let dot = "";
 
-  for (var i = 0; i < arr.length; i++) {
-    var record = arr[i];
-
-    if (record.length == 2)
+  for (let record of arr) {
+    if (record.length === 2)
       dot += "    " + record[0] + " " + serializeDot(record[1]) + "\r\n";
-    else if (record.length == 3)
+    else if (record.length === 3)
       dot +=
         "    " +
         record[0] +
@@ -168,7 +164,7 @@ const serializeDotElements = function(arr) {
 };
 
 const buildDotHeader = function(isDark) {
-  var header = "digraph G {\r\n";
+  let header = "digraph G {\r\n";
 
   if (isDark) {
     header += "  graph [ bgcolor=transparent, fontname=Helvetica ]\r\n";
@@ -182,21 +178,21 @@ const buildDotHeader = function(isDark) {
   return header;
 };
 
-loadColors = function() {
-  if (colorTable != null) return;
+let loadColors = function() {
+  if (colorTable !== null) return;
   else colorTable = {};
 
-  var rgb = fs
+  const rgb = fs
     .readFileSync(__dirname + "/../data/rgb.txt", {
       encoding: "utf8",
       flag: "r",
     })
     .split("\n");
-  for (var i = 0; i < rgb.length; i++) {
-    var parts = /^(\d+) (\d+) (\d+) (.*)$/.exec(rgb[i]);
+  for (let i = 0; i < rgb.length; i++) {
+    const parts = /^(\d+) (\d+) (\d+) (.*)$/.exec(rgb[i]);
 
-    if (parts != null && parts.length == 5 && parts[4].indexOf(" ") < 0) {
-      var luma =
+    if (parts !== null && parts.length === 5 && parts[4].indexOf(" ") < 0) {
+      const luma =
         0.2126 * parseFloat(parts[0]) +
         0.7152 * parseFloat(parts[1]) +
         0.0722 * parseFloat(parts[2]);
@@ -205,9 +201,9 @@ loadColors = function() {
   }
 };
 
-getLuma = function(color) {
+let getLuma = function(color) {
   loadColors();
-  var luma = 128;
+  let luma = 128;
 
   if (color.startsWith("#"))
     luma =

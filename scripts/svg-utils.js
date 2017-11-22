@@ -11,22 +11,22 @@ const shapes = {
 };
 
 module.exports = function(svg, isDark) {
-  var expr = /<text\s.*>{img:.*}.*<\/text>/g;
+  const expr = /<text\s.*>{img:.*}.*<\/text>/g;
 
   svg = svg.replace(expr, function(match) {
     try {
-      var parts = /<text\s(.*)>{img:(.*)}(.*)<\/text>/.exec(match);
-      var text = "<text " + parts[1] + ">" + parts[3].trim() + "</text>";
+      const parts = /<text\s(.*)>{img:(.*)}(.*)<\/text>/.exec(match);
+      let text = "<text " + parts[1] + ">" + parts[3].trim() + "</text>";
 
       if (!shapes.hasOwnProperty(parts[2])) return text;
 
-      var translate = /<text\s.*x=\"(-?[0-9\.]+)\" y=\"(-?[0-9\.]+)\"/.exec(
+      const translate = /<text\s.*x=\"(-?[0-9\.]+)\" y=\"(-?[0-9\.]+)\"/.exec(
         text
       );
-      var x = translate[1];
-      var y = translate[2];
+      const x = translate[1];
+      const y = translate[2];
 
-      var img = shapes[parts[2]];
+      const img = shapes[parts[2]];
       text = text.replace(
         ' x="' + x + '"',
         ' x="' + (parseFloat(x) + img[1]) + '"'

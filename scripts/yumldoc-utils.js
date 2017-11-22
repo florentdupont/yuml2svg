@@ -1,4 +1,5 @@
 const fs = require("fs");
+
 const classDiagram = require("./class-diagram.js");
 const usecaseDiagram = require("./usecase-diagram.js");
 const activityDiagram = require("./activity-diagram.js");
@@ -7,20 +8,21 @@ const deploymentDiagram = require("./deployment-diagram.js");
 const packageDiagram = require("./package-diagram.js");
 const Viz = require("viz.js");
 const processEmbeddedImages = require("./svg-utils.js");
+const { buildDotHeader } = require("./yuml2dot-utils");
 
 const processYumlDocument = function(text, filename, mayGenerate) {
-  var newlines = [];
-  var options = { dir: "TB", generate: false };
+  const newlines = [];
+  const options = { dir: "TB", generate: false };
 
-  var lines = text.split(/\r|\n/);
+  const lines = text.split(/\r|\n/);
 
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].replace(/^\s+|\s+$/g, ""); // Removes leading and trailing spaces
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].replace(/^\s+|\s+$/g, ""); // Removes leading and trailing spaces
     if (line.startsWith("//")) processDirectives(line, options);
     else if (line.length > 0) newlines.push(line);
   }
 
-  if (newlines.length == 0) return "";
+  if (newlines.length === 0) return "";
 
   if (!options.hasOwnProperty("type")) {
     options.error = "Error: Missing mandatory 'type' directive";
@@ -30,7 +32,7 @@ const processYumlDocument = function(text, filename, mayGenerate) {
     return options.error;
   }
 
-  var dot = null;
+  let dot = null;
 
   try {
     switch (options.type) {
@@ -57,9 +59,9 @@ const processYumlDocument = function(text, filename, mayGenerate) {
     return "Error parsing the yUML file";
   }
 
-  if (dot == null) return "Error: unable to parse the yUML file";
+  if (dot === null) return "Error: unable to parse the yUML file";
 
-  var svgLight, svgDark;
+  let svgLight, svgDark;
   try {
     svgLight = Viz(buildDotHeader(false) + dot);
     svgLight = processEmbeddedImages(svgLight, false);
@@ -72,7 +74,7 @@ const processYumlDocument = function(text, filename, mayGenerate) {
 
   try {
     if (options.generate === true && mayGenerate === true) {
-      var imagename = filename.replace(/\.[^.$]+$/, ".svg");
+      const imagename = filename.replace(/\.[^.$]+$/, ".svg");
       fs.writeFileSync(imagename, svgLight);
     }
   } catch (e) {}
@@ -86,17 +88,17 @@ const processYumlDocument = function(text, filename, mayGenerate) {
   );
 };
 
-processDirectives = function(line, options) {
+let processDirectives = function(line, options) {
   const directions = {
     leftToRight: "LR",
     rightToLeft: "RL",
     topDown: "TB",
   };
 
-  var keyvalue = /^\/\/\s+\{\s*([\w]+)\s*:\s*([\w]+)\s*\}$/.exec(line); // extracts directives as:  // {key:value}
-  if (keyvalue != null && keyvalue.length == 3) {
-    var key = keyvalue[1];
-    var value = keyvalue[2];
+  const keyvalue = /^\/\/\s+\{\s*([\w]+)\s*:\s*([\w]+)\s*\}$/.exec(line); // extracts directives as:  // {key:value}
+  if (keyvalue !== null && keyvalue.length === 3) {
+    const key = keyvalue[1];
+    const value = keyvalue[2];
 
     switch (key) {
       case "type":
