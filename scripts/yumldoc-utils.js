@@ -10,16 +10,30 @@ const packageDiagram = require("./package-diagram.js");
 const processEmbeddedImages = require("./svg-utils.js");
 const { buildDotHeader } = require("./yuml2dot-utils");
 
-const processYumlDocument = function(text, filename, mayGenerate) {
+const SVGError = errorMessage =>
+  "<svg xmlns='http://www.w3.org/2000/svg' width='350' height='30'>" +
+  "<text fill='red' x='10' y='20'>" +
+  errorMessage +
+  "</text>" +
+  "</svg>";
+
+/**
+ * Generates SVG diagram.
+ * @param {string} text The yUML document to parse
+ * @param {boolean} isDark
+ */
+const processYumlDocument = function(text, isDark) {
   const newlines = [];
   const options = { dir: "TB", generate: false };
 
-  const lines = text.split(/\r|\n/);
+  const lines = text.split(/\r|\n/).map(line => line.trim());
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].replace(/^\s+|\s+$/g, ""); // Removes leading and trailing spaces
-    if (line.startsWith("//")) processDirectives(line, options);
-    else if (line.length > 0) newlines.push(line);
+  for (let line of lines) {
+    if (line.startsWith("//")) {
+      processDirectives(line, options);
+    } else if (line.length > 0) {
+      newlines.push(line);
+    }
   }
 
   if (newlines.length === 0) return "";
@@ -29,7 +43,7 @@ const processYumlDocument = function(text, filename, mayGenerate) {
   }
 
   if (options.hasOwnProperty("error")) {
-    return options.error;
+    return SVGError(options.error);
   }
 
   let dot = null;
@@ -57,34 +71,24 @@ const processYumlDocument = function(text, filename, mayGenerate) {
     }
   } catch (e) {
     console.error(e);
-    return "Error parsing the yUML file";
+    return SVGError("Rendering failed, see console for more info!");
   }
 
-  if (dot === null) return "Error: unable to parse the yUML file";
+  if (dot === null) return SVGError("Error: unable to parse the yUML file");
 
   let svgLight, svgDark;
   try {
-    svgLight = Viz(buildDotHeader(false) + dot);
+    svgLight = Viz(buildDotHeader(!!isDark) + dot);
     svgLight = processEmbeddedImages(svgLight, false);
 
     // svgDark = Viz(buildDotHeader(true) + dot);
     // svgDark = processEmbeddedImages(svgDark, true);
   } catch (e) {
     console.error(e);
-    return "Error composing the diagram";
-  }
-
-  if (options.generate === true && mayGenerate === true) {
-    const imagename = filename.replace(/\.[^.$]+$/, ".svg");
-    fs.writeFile(imagename, svgLight, err => err && console.error(err));
+    return SVGError("Error composing the diagram");
   }
 
   return svgLight;
-  // "<div id='light'>\n" +
-  // svgLight +
-  // "\n</div><div id='dark'>\n" +
-  // svgDark +
-  // "\n</div>"
 };
 
 let processDirectives = function(line, options) {

@@ -1,10 +1,9 @@
 {
-  "name": "yuml",
-  "displayName": "yUML",
+  "name": "yuml2svg",
+  "displayName": "yUML to SVG",
   "description": "UML diagramming tool based on the yUML syntax",
   "version": "3.0.0",
   "icon": "images/yUML.png",
-  "publisher": "JaimeOlivares",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,9 +26,7 @@
     "viz.js": "^1.7.1"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "eslint": "^3.6.0",
-    "mocha": "^2.3.3"
+    "eslint": "^3.6.0"
   }
 }
