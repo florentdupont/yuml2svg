@@ -60,7 +60,7 @@ function parseYumlExpr(specLine) {
         tokens = part.split("-");
       }
 
-      if (tokens.length !== 2) throw "Invalid expression";
+      if (tokens.length !== 2) throw new Error(`Invalid expression - ${JSON.stringify(tokens)}.`);
 
       const left = tokens[0];
       const right = tokens[1];
@@ -99,7 +99,7 @@ function parseYumlExpr(specLine) {
       rtext = tokens[1];
 
       exprs.push(["edge", lstyle, ltext, rstyle, rtext, style]);
-    } else throw "Invalid expression";
+    } else throw new Error(`Invalid expression - ${part}.`);
   }
 
   return exprs;

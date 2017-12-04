@@ -40,7 +40,7 @@ function parseYumlExpr(specLine) {
       // line w/ or wo/ label
       part = part.substr(0, part.length - 1).trim();
       exprs.push(["edge", "none", "none", part, "solid"]);
-    } else throw "Invalid expression";
+    } else throw new Error(`Invalid expression - ${part}.`);
   }
 
   return exprs;

@@ -21,10 +21,17 @@ const SVGError = errorMessage =>
  * Generates SVG diagram.
  * @param {string} text The yUML document to parse
  * @param {boolean} isDark
+ * @param {object} [options] - The options to be set for generating the SVG
+ * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
+ * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
+ * @param {boolean} [options.generate] - Indicates if a .svg file shall be generated on each save.
  */
-const processYumlDocument = function(text, isDark) {
+const processYumlDocument = function(text, isDark, options) {
   const newlines = [];
-  const options = { dir: "TB", generate: false };
+  if (!options) options = {};
+  if (!options.dir) options.dir = "TB";
+  if (!options.type) options.type = "class";
+  if (options.generate === null || options.generate === undefined) options.generate = false;
 
   const lines = text.split(/\r|\n/).map(line => line.trim());
 

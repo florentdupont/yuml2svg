@@ -44,7 +44,7 @@ function parseYumlExpr(specLine) {
     } else if (part === "-") {
       // connector for notes
       exprs.push(["edge", "none", "none", "", "solid"]);
-    } else throw "Invalid expression";
+    } else throw new Error(`Invalid expression - ${part}.`);
   }
 
   return exprs;
