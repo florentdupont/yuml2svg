@@ -55,7 +55,7 @@ function parseYumlExpr(specLine) {
           exprs.push(["edge", "none", "", "empty", "solid"]);
           break;
         default:
-          throw "Invalid expression";
+          throw new Error(`Invalid expression - ${part}.`);
       }
   }
 
