@@ -1,5 +1,19 @@
 # yUML to SVG
 
+## Installation
+
+You can install it with npm:
+
+```bash
+npm install yuml2svg
+```
+
+Or with yarn:
+
+```bash
+yarn add yuml2svg
+```
+
 ## Features
 
 * Embedded rendering engine: **No need to call an external web service**
