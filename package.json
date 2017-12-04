@@ -2,7 +2,7 @@
   "name": "yuml2svg",
   "displayName": "yUML to SVG",
   "description": "UML diagramming tool based on the yUML syntax",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "icon": "images/yUML.png",
   "license": "MIT",
   "repository": {
@@ -12,14 +12,20 @@
   "bugs": {
     "url": "https://github.com/aduh95/vscode-yuml/issues"
   },
-  "homepage":
-    "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
+  "homepage": "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
   "engines": {
     "node": ">=6.5.0"
   },
-  "categories": ["Languages", "Snippets", "Other"],
-  "keywords": ["yuml", "uml", "diagrams"],
-
+  "categories": [
+    "Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "yuml",
+    "uml",
+    "diagrams"
+  ],
   "main": "./index.js",
   "dependencies": {
     "color": "^2.0.1",
