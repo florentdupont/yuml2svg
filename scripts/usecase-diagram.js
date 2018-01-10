@@ -14,7 +14,7 @@ Actor	            [Customer]
 <<Extend>>	        (Login)<(Forgot Password)
 <<Include>>	        (Register)>(Confirm Email)
 Actor Inheritance	[Admin]^[User]
-Notes	            [Admin]^[User],[Admin]-(note: Most privilidged user)
+Notes	            [Admin]^[User],[Admin]-(note: Most privileged user)
 */
 
 function parseYumlExpr(specLine) {
@@ -123,7 +123,7 @@ function composeDotExpr(specLines, options) {
         labeldistance: 2,
         fontsize: 10,
       };
-      if (elem[1][2].len > 0) edge.label = elem[1][2];
+      if (elem[1][2].length > 0) edge.label = elem[1][2];
 
       dot +=
         "    " +
@@ -133,8 +133,7 @@ function composeDotExpr(specLines, options) {
         " " +
         serializeDot(edge) +
         "\n";
-    }
-  }
+  
 
   dot += "}\n";
   return dot;
