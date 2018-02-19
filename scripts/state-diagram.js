@@ -17,6 +17,7 @@ Activity         (Find Products)
 Flow	         (start)->(Find Products)
 Multiple Assoc.  (start)->(Find Products)->(end)
 Complex case     (Simulator running)[Pause]->(Simulator paused|do/wait)[Unpause]->(Simulator running)
+Comment          // Comments
 */
 
 function parseYumlExpr(specLine) {

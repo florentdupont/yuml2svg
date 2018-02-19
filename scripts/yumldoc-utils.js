@@ -31,7 +31,8 @@ const processYumlDocument = function(text, isDark, options) {
   if (!options) options = {};
   if (!options.dir) options.dir = "TB";
   if (!options.type) options.type = "class";
-  if (options.generate === null || options.generate === undefined) options.generate = false;
+  if (options.generate === null || options.generate === undefined)
+    options.generate = false;
 
   const lines = text.split(/\r|\n/).map(line => line.trim());
 
