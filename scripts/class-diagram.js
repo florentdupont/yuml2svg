@@ -60,7 +60,8 @@ function parseYumlExpr(specLine) {
         tokens = part.split("-");
       }
 
-      if (tokens.length !== 2) throw new Error(`Invalid expression - ${JSON.stringify(tokens)}.`);
+      if (tokens.length !== 2)
+        throw new Error(`Invalid expression - ${JSON.stringify(tokens)}.`);
 
       const left = tokens[0];
       const right = tokens[1];
@@ -254,7 +255,6 @@ function composeDotExpr(specLines, options) {
         " " +
         serializeDot(edge3) +
         ";}\n";
-      //dot += '    ' + uids[recordName(elem[0][1])] + " -> "  + uids[recordName(elem[2][1])] + " [color=red]\n";
     }
   }
 
