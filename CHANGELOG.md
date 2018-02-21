@@ -1,9 +1,17 @@
 # Change Log
 
-## 3.0.0
+## 3.0.
 
 * Remove global scope uses
 * Remove VSCode extension code (this fork aims to be used as a NPM module)
+
+## 2.13 (in progress)
+
+* Added Sequence diagrams
+
+## 2.12
+
+* Fixed issues related to restrictions for publishing in the Marketplace
 
 ## 2.10
 
