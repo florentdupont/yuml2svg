@@ -24,14 +24,14 @@
   "keywords": [
     "yuml",
     "uml",
-    "diagrams"
+    "diagram",
+    "sequence",
+    "markdown"
   ],
   "main": "./index.js",
   "dependencies": {
     "color": "^2.0.1",
-    "viz.js": "^1.7.1"
-  },
-  "dependencies": {
+    "viz.js": "^1.7.1",
     "jsdom": "^11.6.2"
   },
   "devDependencies": {

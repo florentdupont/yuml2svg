@@ -1,13 +1,20 @@
 # Change Log
 
-## 3.0.
+## 3.0
 
 * Remove global scope uses
 * Remove VSCode extension code (this fork aims to be used as a NPM module)
 
-## 2.13 (in progress)
+## 2.14
+
+* Added Markdown support
+* Improved the generation of SVG artifacts
+* Improved rendering for dark and light themes
+
+## 2.13
 
 * Added Sequence diagrams
+* Solved issue #31
 
 ## 2.12
 
