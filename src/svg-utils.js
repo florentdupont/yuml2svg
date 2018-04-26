@@ -10,43 +10,35 @@ const shapes = {
   ],
 };
 
+/**
+ * @param {string} svg
+ * @param {boolean} isDark
+ * @returns {string}
+ */
 module.exports = function(svg, isDark) {
   const expr = /<text\s.*>{img:.*}.*<\/text>/g;
 
   svg = svg.replace(expr, function(match) {
     try {
       const parts = /<text\s(.*)>{img:(.*)}(.*)<\/text>/.exec(match);
-      let text = "<text " + parts[1] + ">" + parts[3].trim() + "</text>";
+      const text = "<text " + parts[1] + ">" + parts[3].trim() + "</text>";
 
       if (!shapes.hasOwnProperty(parts[2])) return text;
 
       const translate = /<text\s.*x=\"(-?[0-9\.]+)\" y=\"(-?[0-9\.]+)\"/.exec(
         text
       );
-      const x = translate[1];
-      const y = translate[2];
+      const [_, x, y] = translate;
 
       const img = shapes[parts[2]];
-      text = text.replace(
-        ' x="' + x + '"',
-        ' x="' + (parseFloat(x) + img[1]) + '"'
-      );
-      text = text.replace(
-        ' y="' + y + '"',
-        ' y="' + (parseFloat(y) + img[2]) + '"'
-      );
 
       return (
-        '<g transform="translate(' +
-        x +
-        "," +
-        y +
-        ')" style="fill:none;stroke:' +
-        (isDark ? "white" : "black") +
-        ';stroke-width:1px">' +
-        img[0] +
-        "</g>\n" +
+        `<g transform="translate(${x}, ${y})" style="fill:none;stroke:${
+          isDark ? "white" : "black"
+        };stroke-width:1px">${img[0]}</g>\n` +
         text
+          .replace(' x="' + x + '"', ' x="' + (parseFloat(x) + img[1]) + '"')
+          .replace(' y="' + y + '"', ' y="' + (parseFloat(y) + img[2]) + '"')
       );
     } catch (e) {
       return match;
