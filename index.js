@@ -1,1 +1,1 @@
-module.exports = require("./scripts/yumldoc-utils.js");
+module.exports = require("./src/yumldoc-utils.js");
