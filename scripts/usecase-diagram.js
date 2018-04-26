@@ -133,7 +133,8 @@ function composeDotExpr(specLines, options) {
         " " +
         serializeDot(edge) +
         "\n";
-  
+    }
+  }
 
   dot += "}\n";
   return dot;

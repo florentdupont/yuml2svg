@@ -23,7 +23,7 @@ function parseYumlExpr(specLine) {
   const parts = splitYumlExpr(specLine, "[");
 
   for (let i = 0; i < parts.length; i++) {
-    var part = parts[i].trim();
+    let part = parts[i].trim();
     if (part.length === 0) continue;
 
     if (part.match(/^\[.*\]$/)) {
