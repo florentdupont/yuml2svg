@@ -36,14 +36,14 @@ module.exports = function(svg, isDark) {
         return (
           `<g transform="translate(${translateX}, ${translateY})" style="fill:none;stroke:${
             isDark ? "white" : "black"
-          };stroke-width:1px">${img.svgNode.join("")}</g>\n` +
+          };stroke-width:1px">${img.svgNodes.join("")}</g>\n` +
           textNode
             .replace(
-              ' x="' + x + '"',
+              ' x="' + translateX + '"',
               ' x="' + (parseFloat(translateX) + img.translateX) + '"'
             )
             .replace(
-              ' y="' + y + '"',
+              ' y="' + translateY + '"',
               ' y="' + (parseFloat(translateY) + img.translateY) + '"'
             )
         );
