@@ -23,12 +23,9 @@ Close activation at source      [Source])message>[Dest]
 Cancel activation box           [Source])X
 */
 
-const actors = [];
-const signals = [];
-
 function parseYumlExpr(specLine) {
   const exprs = [];
-  const parts = this.splitYumlExpr(specLine, "[");
+  const parts = splitYumlExpr(specLine, "[");
 
   for (let i = 0; i < parts.length; i++) {
     let part = parts[i].trim();
@@ -77,7 +74,10 @@ function parseYumlExpr(specLine) {
   return exprs;
 }
 
-function composeSVG(specLines) {
+function composeSVG(specLines, options) {
+  const actors = [];
+  const signals = [];
+
   let actorA;
   let label;
   const uids = {};
@@ -173,13 +173,8 @@ function composeSVG(specLines) {
     }
   }
 
-  let r = new Renderer(actors, signals, uids, true);
-  const svgDark = r.svg_.serialize();
-
-  r = new Renderer(actors, signals, uids, false);
-  const svgLight = r.svg_.serialize();
-
-  return [svgLight, svgDark];
+  const renderer = new Renderer(actors, signals, uids, options.isDark);
+  return renderer.svg_.serialize();
 }
 
 module.exports = composeSVG;
