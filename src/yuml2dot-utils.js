@@ -116,16 +116,14 @@ const formatLabel = function(label, wrap, allowDivisors) {
 };
 
 const wordwrap = function(str, width, newline) {
-  if (!str || str.length < width) return str;
-
-  let p;
-  for (p = width; p > 0 && str[p] !== " "; p--) {}
-  if (p > 0) {
-    const left = str.substring(0, p);
-    const right = str.substring(p + 1);
-    return left + newline + wordwrap(right, width, newline);
+  if (str && str.length >= width) {
+    let p = str.lastIndexOf(" ");
+    if (p > 0) {
+      const left = str.substring(0, p);
+      const right = str.substring(p + 1);
+      return left + newline + wordwrap(right, width, newline);
+    }
   }
-
   return str;
 };
 

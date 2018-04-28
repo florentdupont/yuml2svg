@@ -26,7 +26,8 @@ const directions = {
  * @param {object} [options] - The options to be set for generating the SVG
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
  * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
- * @param {string} [options.isDark]
+ * @param {string} [options.isDark] - Option to get dark or light diagram
+ * @returns {string} The rendered diagram as a SVG document
  */
 const processYumlDocument = function(text, options) {
   if (!options) options = {};

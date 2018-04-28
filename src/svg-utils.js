@@ -14,9 +14,9 @@ const shapes = {
 
 /**
  * Process embedded shapes {img:shapeName}
- * @param {string} svg
- * @param {boolean} isDark
- * @returns {string}
+ * @param {string} svg The SVG document to parse
+ * @param {boolean} isDark Option to get dark or light shapes
+ * @returns {string} SVG document embedding shapes
  */
 module.exports = function(svg, isDark) {
   const expr = /<text\s(.*)>{img:(.*)}(.*)<\/text>/g;

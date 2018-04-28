@@ -54,8 +54,8 @@ function parseYumlExpr(specLine) {
 
       let message = "";
       const pos = part.match(/[\.|>]{0,1}>[\(|\)]{0,1}$/);
-      if (pos == null) {
-        throw "Invalid expression";
+      if (pos === null) {
+        throw new Error("Invalid expression");
       } else if (pos.index > 0) {
         message = part.substr(0, pos.index);
         part = part.substr(pos.index);
@@ -68,7 +68,7 @@ function parseYumlExpr(specLine) {
       }
 
       exprs.push(["signal", prefix, message, style, suffix]);
-    } else throw "Invalid expression";
+    } else throw new Error("Invalid expression");
   }
 
   return exprs;
@@ -78,8 +78,6 @@ function composeSVG(specLines, options) {
   const actors = [];
   const signals = [];
 
-  let actorA;
-  let label;
   const uids = {};
   for (let i = 0; i < specLines.length; i++) {
     const elem = parseYumlExpr(specLines[i]);
@@ -88,79 +86,69 @@ function composeSVG(specLines, options) {
       const type = elem[k][0];
 
       if (type === "object") {
-        label = elem[k][1];
-        const rn = recordName(label);
-        if (uids.hasOwnProperty(rn)) continue;
+        let label = elem[k][1];
+        const name = recordName(label);
+        if (name in uids) continue;
 
         label = formatLabel(label, 20, true);
         const actor = {
           type: elem[k][0],
-          name: rn,
-          label: label,
+          name,
+          label,
           index: actors.length,
         };
-        uids[rn] = actor;
+        uids[name] = actor;
 
         actors.push(actor);
       }
     }
 
-    if (
-      elem.length === 3 &&
-      elem[0][0] === "object" &&
-      elem[1][0] === "signal" &&
-      elem[2][0] === "object"
-    ) {
-      const message = elem[1][2];
-      const style = elem[1][3];
-      actorA = uids[recordName(elem[0][1])];
+    const isValidElem =
+      elem.length === 3 && elem[0][0] === "object" && elem[1][0] === "signal";
+
+    if (isValidElem && elem[2][0] === "object") {
+      const [_, __, message, style] = elem[1];
+      const actorA = uids[recordName(elem[0][1])];
       const actorB = uids[recordName(elem[2][1])];
-      let signal = null;
 
       switch (style) {
         case "dashed":
-          signal = {
+          signals.push({
             type: "signal",
-            actorA: actorA,
-            actorB: actorB,
+            actorA,
+            actorB,
             linetype: "dashed",
             arrowtype: "arrow-filled",
-            message: message,
-          };
+            message,
+          });
           break;
         case "solid":
-          signal = {
+          signals.push({
             type: "signal",
-            actorA: actorA,
-            actorB: actorB,
+            actorA,
+            actorB,
             linetype: "solid",
             arrowtype: "arrow-filled",
-            message: message,
-          };
+            message,
+          });
           break;
         case "async":
-          signal = {
+          signals.push({
             type: "signal",
-            actorA: actorA,
-            actorB: actorB,
+            actorA,
+            actorB,
             linetype: "solid",
             arrowtype: "arrow-open",
-            message: message,
-          };
+            message,
+          });
           break;
-      }
 
-      if (signal != null) signals.push(signal);
-    } else if (
-      elem.length === 3 &&
-      elem[0][0] === "object" &&
-      elem[1][0] === "signal" &&
-      elem[2][0] === "note"
-    ) {
-      actorA = uids[recordName(elem[0][1])];
-      label = elem[2][1];
-      label = formatLabel(label, 20, true);
-      const note = { type: "note", message: label, actor: actorA };
+        default:
+      }
+    } else if (isValidElem && elem[2][0] === "note") {
+      const actor = uids[recordName(elem[0][1])];
+      const message = formatLabel(elem[2][1], 20, true);
+      const note = { type: "note", message, actor };
 
       if (elem[2][2])
         // background color
