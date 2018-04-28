@@ -80,15 +80,12 @@ function composeDotExpr(specLines, options) {
             label: "",
           };
         } else {
-          label = formatLabel(label, 20, true);
-          if (type === "record") label = "{" + label + "}";
-
           node = {
             shape: type,
             height: 0.5,
             fontsize: 10,
             margin: "0.20,0.05",
-            label: label,
+            label: formatLabel(label, 20, true),
             style: "rounded",
           };
 

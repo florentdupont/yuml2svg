@@ -119,23 +119,18 @@ function composeDotExpr(specLines, options) {
 
     for (let k = 0; k < elem.length; k++) {
       if (elem[k][0] === "note" || elem[k][0] === "record") {
-        let label = elem[k][1];
+        const label = elem[k][1];
         if (uids.hasOwnProperty(recordName(label))) continue;
 
         uid = "A" + (len++).toString();
         uids[recordName(label)] = uid;
-
-        label = formatLabel(label, 20, true);
-        if (elem[k][0] === "record" && options.dir === "TB") {
-          label = "{" + label + "}";
-        }
 
         const node = {
           shape: elem[k][0],
           height: 0.5,
           fontsize: 10,
           margin: "0.20,0.05",
-          label: label,
+          label: formatLabel(label, 20, true),
         };
 
         if (elem[k][2]) {

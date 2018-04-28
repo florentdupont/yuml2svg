@@ -127,17 +127,27 @@ const wordwrap = function(str, width, newline) {
   return str;
 };
 
-const serializeDot = function(obj) {
+const serializeDot = function(node) {
+  if (node.shape && node.shape === "record") {
+    // Graphviz documentation says (https://www.graphviz.org/doc/info/shapes.html):
+    // The record-based shape has largely been superseded and greatly generalized by HTML-like labels.
+    // That is, instead of using shape=record, one might consider using shape=none, margin=0 and an HTML-like label. [...]
+    // Also note that there are problems using non-trivial edges (edges with ports or labels) between adjacent nodes
+    // on the same rank if one or both nodes has a record shape.
+
+    // To avoid this issue, we can use a "rectangle" shape
+    node.shape = "rectangle";
+  }
   return (
-    Object.keys(obj)
-      .reduce(
-        (pv, key) =>
-          `${pv} ${key} = ` +
-          ("string" === typeof obj[key] ? `"${obj[key]}"` : obj[key]) +
-          ",",
-        "["
+    "[" +
+    Object.keys(node)
+      .map(
+        key =>
+          `${key}=` +
+          ("string" === typeof node[key] ? `"${node[key]}"` : node[key])
       )
-      .slice(0, -1) + " ]"
+      .join(" , ") +
+    " ]"
   );
 };
 
