@@ -68,10 +68,10 @@ const processYumlDocument = function(text, options) {
   }
 };
 
-let processDirectives = function(line, options) {
-  const keyvalue = /^\/\/\s+\{\s*([\w]+)\s*:\s*([\w]+)\s*\}$/.exec(line); // extracts directives as:  // {key:value}
-  if (keyvalue !== null && keyvalue.length === 3) {
-    const [_, key, value] = keyvalue;
+const processDirectives = function(line, options) {
+  const keyValue = /^\/\/\s+\{\s*([\w]+)\s*:\s*([\w]+)\s*\}$/.exec(line); // extracts directives as:  // {key:value}
+  if (keyValue !== null && keyValue.length === 3) {
+    const [_, key, value] = keyValue;
 
     switch (key) {
       case "type":
