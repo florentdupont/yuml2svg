@@ -76,28 +76,26 @@ const processDirectives = function(line, options) {
 
     switch (key) {
       case "type":
-        const diagramTypeNames = Object.keys(diagramTypes);
-        if (diagramTypeNames.find(type => type === value)) {
+        if (value in diagramTypes) {
           options.type = value;
         } else {
           console.warn(
             new Error(
               "Invalid value for 'type'. Allowed values are: " +
-                diagramTypeNames.join(", ")
+                Object.keys(diagramTypes).join(", ")
             )
           );
         }
         break;
 
       case "direction":
-        const directionNames = Object.keys(directions);
-        if (directionNames.find(type => type === value)) {
+        if (value in directions) {
           options.dir = directions[value];
         } else {
           console.warn(
             new Error(
               "Invalid value for 'direction'. Allowed values are: " +
-                directionNames.join(", ")
+                Object.keys(directions).join(", ")
             )
           );
         }
