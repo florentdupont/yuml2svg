@@ -3,10 +3,12 @@ const { JSDOM } = require("jsdom");
 const NS = "http://www.w3.org/2000/svg";
 
 module.exports = function(isDark) {
-  const { document } = new JSDOM('<svg xmlns="' + NS + '">\n</svg>').window;
+  const { document } = new JSDOM().window;
+  const svgElement = document.createElement("svg");
+  svgElement.setAttribute("xmlns", NS);
 
   this.getDocument = function() {
-    return this.root_.firstChild;
+    return svgElement;
   };
 
   this.setDocumentSize = function(width, height) {
@@ -36,7 +38,7 @@ module.exports = function(isDark) {
     for (let i = 0; i < lines.length; i++) {
       const text = document.createElementNS(NS, "text");
       text.textContent = lines[i];
-      text.setAttribute("fill", color ? color : isDark ? "white" : "black");
+      text.setAttribute("fill", color || isDark ? "white" : "black");
 
       text.setAttribute("x", x);
       text.setAttribute("y", y);
@@ -59,7 +61,7 @@ module.exports = function(isDark) {
       width = Math.max(width, 8.5 * lines[i].length);
     }
 
-    return { x: 0, y: 0, width: width, height: 18 * lines.length };
+    return { x: 0, y: 0, width, height: 18 * lines.length };
   };
 
   this.createPath = function(format, linetype) {
@@ -80,54 +82,7 @@ module.exports = function(isDark) {
     return path;
   };
 
-  this.createNewDocument = function() {
-    if (typeof document === "undefined") return null;
-
-    this.root_ = document.body;
-
-    const filledArrow = document.createElementNS(NS, "marker");
-    const filledArrowPath = this.createPath("M0,0 6,3 0,6z", "solid");
-    filledArrow.appendChild(filledArrowPath);
-
-    const openArrow = document.createElementNS(NS, "marker");
-    const openArrowPath = this.createPath("M0,0 6,3 0,6", "solid");
-    openArrow.appendChild(openArrowPath);
-
-    const defs = document.createElementNS(NS, "defs");
-    defs.appendChild(filledArrow);
-    defs.appendChild(openArrow);
-
-    filledArrow.setAttribute("id", "arrow-filled");
-    filledArrow.setAttribute("refX", "6");
-    filledArrow.setAttribute("refY", "3");
-    filledArrow.setAttribute("markerWidth", "6");
-    filledArrow.setAttribute("markerHeight", "6");
-    filledArrow.setAttribute("orient", "auto");
-
-    filledArrowPath.setAttribute(
-      "style",
-      "stroke: none; fill: " + (isDark ? "white;" : "black;")
-    );
-
-    openArrow.setAttribute("id", "arrow-open");
-    openArrow.setAttribute("refX", "6");
-    openArrow.setAttribute("refY", "3");
-    openArrow.setAttribute("markerWidth", "6");
-    openArrow.setAttribute("markerHeight", "6");
-    openArrow.setAttribute("orient", "auto");
-
-    openArrowPath.setAttribute(
-      "style",
-      "stroke-width: 1; stroke: " + (isDark ? "white;" : "black;")
-    );
-
-    this.getDocument().appendChild(defs);
-  };
-
   this.serialize = function() {
     return this.getDocument().outerHTML;
   };
-
-  this.root_ = null;
-  this.createNewDocument();
 };
