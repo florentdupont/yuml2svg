@@ -1,17 +1,17 @@
 const fs = require("fs");
-const Viz = require("viz.js");
 
-const processEmbeddedImages = require("./svg-utils.js");
+const dot2svg = require("./dot2svg");
+const processEmbeddedImages = require("./svg-utils");
 const { buildDotHeader } = require("./yuml2dot-utils");
 
 const diagramTypes = {
-  class: require("./class-diagram.js"),
-  usecase: require("./usecase-diagram.js"),
-  activity: require("./activity-diagram.js"),
-  state: require("./state-diagram.js"),
-  deployment: require("./deployment-diagram.js"),
-  package: require("./package-diagram.js"),
-  sequence: require("./sequence-diagram.js"),
+  class: require("./class-diagram"),
+  usecase: require("./usecase-diagram"),
+  activity: require("./activity-diagram"),
+  state: require("./state-diagram"),
+  deployment: require("./deployment-diagram"),
+  package: require("./package-diagram"),
+  sequence: require("./sequence-diagram"),
 };
 
 const directions = {
@@ -22,12 +22,12 @@ const directions = {
 
 /**
  * Generates SVG diagram.
- * @param {string} text The yUML document to parse
+ * @param {string | Buffer} text The yUML document to parse
  * @param {object} [options] - The options to be set for generating the SVG
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
  * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
  * @param {string} [options.isDark] - Option to get dark or light diagram
- * @returns {string} The rendered diagram as a SVG document
+ * @returns {Promise<string>} The rendered diagram as a SVG document
  */
 const processYumlDocument = function(text, options) {
   if (!options) options = {};
@@ -35,7 +35,10 @@ const processYumlDocument = function(text, options) {
   if (!options.type) options.type = "class";
   if (!options.isDark) options.isDark = false;
 
-  const lines = text.split(/\r|\n/).map(line => line.trim());
+  const lines = text
+    .toString()
+    .split(/\r|\n/)
+    .map(line => line.trim());
   const newlines = [];
 
   for (const line of lines) {
@@ -60,10 +63,12 @@ const processYumlDocument = function(text, options) {
     const renderingFunction = diagramTypes[options.type];
     const rendered = renderingFunction(newlines, options);
 
-    // Sequence diagrams are rendered as SVG, not dot file -- and has not embedded images (I guess)
+    // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
     return options.type === "sequence"
-      ? rendered
-      : processEmbeddedImages(Viz(buildDotHeader(isDark) + rendered), isDark);
+      ? Promise.resolve(rendered)
+      : dot2svg(buildDotHeader(isDark) + rendered).then(svg =>
+          processEmbeddedImages(svg, isDark)
+        );
   } else {
     throw new Error("Invalid diagram type");
   }

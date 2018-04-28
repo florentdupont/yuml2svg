@@ -1484,9 +1484,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-viz.js@1.5:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-1.5.1.tgz#3952b816f80fb3435eda50803c6aaa9ccd54d6af"
+viz.js@^2.0.0-pre.5:
+  version "2.0.0-pre.5"
+  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-2.0.0-pre.5.tgz#75a5e0898653cc82fd4bbe1a1a2cb6c5388cfcca"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

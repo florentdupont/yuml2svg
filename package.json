@@ -35,7 +35,7 @@
   "dependencies": {
     "color": "^2.0.1",
     "jsdom": "^11.6.2",
-    "viz.js": "1.5"
+    "viz.js": "^2.0.0-pre.5"
   },
   "devDependencies": {
     "@types/node": "^6.0.40",
