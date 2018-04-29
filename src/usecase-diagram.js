@@ -5,6 +5,7 @@ const {
   serializeDot,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const Color = require("color");
 
 /*
 Syntax as specified in yuml.me
@@ -99,8 +100,11 @@ function composeDotExpr(specLines, options) {
           node.height = 0.5;
 
           if (elem[k][2]) {
+            const color = Color(elem[k][2]);
+
             node.style = "filled";
-            node.fillcolor = elem[k][2];
+            node.fillcolor = color.hex();
+            node.fontcolor = color.isDark() ? "white" : "black";
           }
 
           if (elem[k][3]) node.fontcolor = elem[k][3];
@@ -117,7 +121,7 @@ function composeDotExpr(specLines, options) {
       const edge = {
         shape: "edge",
         dir: "both",
-        style: style,
+        style,
         arrowtail: elem[1][1],
         arrowhead: elem[1][3],
         labeldistance: 2,

@@ -5,6 +5,7 @@ const {
   serializeDot,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const Color = require("color");
 
 const RANKSEP = 0.5;
 
@@ -61,25 +62,26 @@ function composeDotExpr(specLines, options) {
       const type = elem[k][0];
 
       if (type === "note" || type === "box3d") {
-        let label = elem[k][1];
+        const label = elem[k][1];
         if (uids.hasOwnProperty(recordName(label))) continue;
 
         const uid = "A" + (len++).toString();
         uids[recordName(label)] = uid;
-
-        label = formatLabel(label, 20, true);
 
         const node = {
           shape: type,
           height: 0.5,
           fontsize: 10,
           margin: "0.20,0.05",
-          label: label,
+          label: formatLabel(label, 20, true),
         };
 
         if (elem[k][2]) {
+          const color = Color(elem[k][2]);
+
           node.style = "filled";
-          node.fillcolor = elem[k][2];
+          node.fillcolor = color.hex();
+          node.fontcolor = color.isDark() ? "white" : "black";
         }
 
         if (elem[k][3]) node.fontcolor = elem[k][3];
@@ -102,7 +104,7 @@ function composeDotExpr(specLines, options) {
         const edge = {
           shape: "edge",
           dir: "both",
-          style: style,
+          style,
           arrowtail: elem[k][1],
           arrowhead: elem[k][2],
           labeldistance: 2,

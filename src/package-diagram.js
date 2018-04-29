@@ -5,6 +5,7 @@ const {
   serializeDot,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const Color = require("color");
 
 const RANKSEP = 0.5;
 
@@ -79,8 +80,11 @@ function composeDotExpr(specLines, options) {
         };
 
         if (elem[k][2]) {
+          const color = Color(elem[k][2]);
+
           node.style = "filled";
-          node.fillcolor = elem[k][2];
+          node.fillcolor = color.hex();
+          node.fontcolor = color.isDark() ? "white" : "black";
         }
 
         if (elem[k][3]) node.fontcolor = elem[k][3];

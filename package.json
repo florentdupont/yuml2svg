@@ -33,7 +33,7 @@
     "lint": "eslint ./src/"
   },
   "dependencies": {
-    "color": "^2.0.1",
+    "color": "^3.0.0",
     "jsdom": "^11.6.2",
     "viz.js": "^2.0.0-pre.5"
   },

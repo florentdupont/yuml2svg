@@ -73,12 +73,10 @@ const extractBgAndNote = function(part, allowNote) {
     part
   );
   if (bgParts !== null && bgParts.length === 3) {
+    const bgColor = Color(bgParts[2].trim());
     ret.part = bgParts[1].trim();
-    ret.bg = bgParts[2].trim().toLowerCase();
-
-    const luma = getLuma(ret.bg);
-    if (luma < 64) ret.fontcolor = "white";
-    else if (luma > 192) ret.fontcolor = "black";
+    ret.bg = bgColor.hex();
+    ret.fontcolor = bgColor.isDark() ? "white" : "black";
   } else {
     ret.part = part.trim();
   }
@@ -178,8 +176,6 @@ const buildDotHeader = function(isDark) {
   }
   return header;
 };
-
-let getLuma = color => Color(color).luminosity() * 128;
 
 module.exports = {
   buildDotHeader,
