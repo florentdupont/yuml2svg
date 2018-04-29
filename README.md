@@ -27,9 +27,17 @@ Please refer to the
 
 The API exports a function that accepts as arguments:
 
-1.  A `Buffer` or a `string` containing the yUML diagram
-2.  A plain `object` containing the options:
+1.  A `Buffer` or a `string` containing the yUML diagram.
+2.  An optional plain `object` containing the options for the rendering.
+3.  An optional plain `object` containing the
+    [options for Viz.js](https://github.com/mdaines/viz.js/wiki/2.0.0-API).
+    Check it out if you are using this package in the browser.
 
+The API returns a `Promise` which resolves in a string containing SVG document
+as a `string`.
+
+> The options for the rendering are:
+>
 > * `dir`: The direction of the diagram "TB" (default) - topDown, "LR" -
 >   leftToRight, "RL" - rightToLeft
 > * `type`: The type of SVG - "class" (default), "usecase", "activity", "state",
@@ -45,9 +53,19 @@ import yuml2svg from "yuml2svg";
 /**
  * Renders a given file into a SVG string asynchronously
  * @param {string} filePath Path to the yUML diagram
- * @param {Promise<string>} callback The SVG document that represents the yUML diagram
+ * @returns {Promise<string>} callback The SVG document that represents the yUML diagram
  */
 const renderFile = filePath => fs.readFile(filePath).then(yuml2svg);
+
+/**
+ * Renders a given file into a SVG string asynchronously
+ * @param {string} filePath Path to the yUML diagram
+ * @param {{dir:string, type: string, isDark: boolean}} [options]
+ * @param {{Module:Module, render: Function}} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
+ * @returns {Promise<string>} callback The SVG document that represents the yUML diagram
+ */
+const renderFileWithOptions = (filePath, options, vizOptions) =>
+  fs.readFile(filePath).then(yuml => yuml2svg(yuml, options, vizOptions));
 
 /**
  * Generates a SVG file from a yUML file
@@ -73,7 +91,7 @@ const yuml2svg = require("yuml2svg");
 /**
  * Renders a given file into a SVG string asynchronously
  * @param {string} filePath Path to the yUML diagram
- * @param {(Error, string)=>any} callback The SVG document that represents the yUML diagram
+ * @param {(Error, string)=>any} callback Async callback
  */
 function renderFile(filePath, callback) {
   fs.readFile(filePath, function(err, yuml) {
@@ -81,6 +99,27 @@ function renderFile(filePath, callback) {
       callback(err);
     } else {
       yuml2svg(yuml)
+        .then(function(svg) {
+          callback(null, svg);
+        })
+        .catch(callback);
+    }
+  });
+}
+
+/**
+ * Renders a given file into a SVG string asynchronously
+ * @param {string} filePath Path to the yUML diagram
+ * @param {{dir:string, type: string, isDark: boolean}} [options]
+ * @param {{Module:Module, render: Function}} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
+ * @param {(Error, string)=>any} callback Async callback
+ */
+function renderFileWithOptions(filePath, options, vizOptions) {
+  fs.readFile(filePath, function(err, yuml) {
+    if (err) {
+      callback(err);
+    } else {
+      yuml2svg(yuml, options, vizOptions)
         .then(function(svg) {
           callback(null, svg);
         })
@@ -100,9 +139,11 @@ function generateSVG(inputFile, outputFile, callback) {
     if (err) {
       callback(err);
     } else {
-      yuml2svg(yuml).then(function(svg) {
-        fs.writeFile(outputFile, svg, callback);
-      });
+      yuml2svg(yuml)
+        .then(function(svg) {
+          fs.writeFile(outputFile, svg, callback);
+        })
+        .catch(callback);
     }
   });
 }
