@@ -27,9 +27,10 @@ const directions = {
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
  * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
  * @param {string} [options.isDark] - Option to get dark or light diagram
+ * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
  * @returns {Promise<string>} The rendered diagram as a SVG document
  */
-const processYumlDocument = function(text, options) {
+const processYumlDocument = function(text, options, vizOptions) {
   if (!options) options = {};
   if (!options.dir) options.dir = "TB";
   if (!options.type) options.type = "class";
@@ -66,7 +67,7 @@ const processYumlDocument = function(text, options) {
     // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
     return options.type === "sequence"
       ? Promise.resolve(rendered)
-      : dot2svg(buildDotHeader(isDark) + rendered).then(svg =>
+      : dot2svg(buildDotHeader(isDark) + rendered, vizOptions).then(svg =>
           processEmbeddedImages(svg, isDark)
         );
   } else {
