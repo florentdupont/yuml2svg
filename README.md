@@ -143,6 +143,14 @@ function generateSVG(inputFile, outputFile, callback) {
 }
 ```
 
+### Run on the browser
+
+You can find a working example of a browser implementation using webpack here:
+[yuml2svg-playground](//github.com/aduh95/yuml2svg-playground).
+
+> The Stream API in not currently supported on the browser, the API can only
+> deal with strings.
+
 ## Credits
 
 * Thanks to the [jaime-olivares](https://github.com/jaime-olivares)'s
