@@ -1,6 +1,4 @@
-const readline = require("readline");
-const { Readable } = require("stream");
-
+const handleStream = require("./handle-stream");
 const dot2svg = require("./dot2svg");
 const processEmbeddedImages = require("./svg-utils");
 const { buildDotHeader } = require("./yuml2dot-utils");
@@ -31,37 +29,27 @@ const directions = {
  * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
  * @returns {Promise<string>} The rendered diagram as a SVG document
  */
-const processYumlDocument = (input, options, vizOptions) =>
-  new Promise((resolve, reject) => {
-    if (!options) options = {};
-    if (!options.dir) options.dir = "TB";
-    if (!options.type) options.type = "class";
-    if (!options.isDark) options.isDark = false;
+const processYumlDocument = (input, options, vizOptions) => {
+  if (!options) options = {};
+  if (!options.dir) options.dir = "TB";
+  if (!options.type) options.type = "class";
+  if (!options.isDark) options.isDark = false;
 
-    const diagramInstructions = [];
+  const diagramInstructions = [];
 
-    if (input instanceof Readable) {
-      const lineReader = readline.createInterface({ input });
+  if (input.read && "function" === typeof input.read) {
+    return handleStream(input, processLine(options, diagramInstructions)).then(
+      () => processYumlData(diagramInstructions, options, vizOptions)
+    );
+  } else {
+    input
+      .toString()
+      .split(/\r|\n/)
+      .forEach(processLine(options, diagramInstructions));
 
-      lineReader.on("line", processLine(options, diagramInstructions));
-      lineReader.on("close", () =>
-        processYumlData(diagramInstructions, options, vizOptions).then(
-          resolve,
-          reject
-        )
-      );
-    } else {
-      input
-        .toString()
-        .split(/\r|\n/)
-        .forEach(processLine(options, diagramInstructions));
-
-      processYumlData(diagramInstructions, options, vizOptions).then(
-        resolve,
-        reject
-      );
-    }
-  });
+    return processYumlData(diagramInstructions, options, vizOptions);
+  }
+};
 
 const processYumlData = (diagramInstructions, options, vizOptions) => {
   if (diagramInstructions.length === 0) {

@@ -1,9 +1,9 @@
-const { JSDOM } = require("jsdom");
+const getDOMWindow = require("./get-dom-window");
 
 const NS = "http://www.w3.org/2000/svg";
 
 module.exports = function(isDark) {
-  const { document } = new JSDOM().window;
+  const { document } = getDOMWindow();
   const svgElement = document.createElement("svg");
   svgElement.setAttribute("xmlns", NS);
 
