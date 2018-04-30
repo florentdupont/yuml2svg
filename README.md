@@ -27,7 +27,7 @@ Please refer to the
 
 The API exports a function that accepts as arguments:
 
-1.  A `Buffer` or a `string` containing the yUML diagram.
+1.  A `Readable` stream, a `Buffer` or a `string` containing the yUML diagram.
 2.  An optional plain `object` containing the options for the rendering.
 3.  An optional plain `object` containing the
     [options for Viz.js](https://github.com/mdaines/viz.js/wiki/2.0.0-API).
@@ -94,17 +94,11 @@ const yuml2svg = require("yuml2svg");
  * @param {(Error, string)=>any} callback Async callback
  */
 function renderFile(filePath, callback) {
-  fs.readFile(filePath, function(err, yuml) {
-    if (err) {
-      callback(err);
-    } else {
-      yuml2svg(yuml)
-        .then(function(svg) {
-          callback(null, svg);
-        })
-        .catch(callback);
-    }
-  });
+  yuml2svg(fs.createReadStream(filePath))
+    .then(function(svg) {
+      callback(null, svg);
+    })
+    .catch(callback);
 }
 
 /**
