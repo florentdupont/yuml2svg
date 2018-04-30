@@ -53,7 +53,7 @@ const processYumlDocument = (input, options, vizOptions) => {
 
 const processYumlData = (diagramInstructions, options, vizOptions) => {
   if (diagramInstructions.length === 0) {
-    return "";
+    return Promise.resolve("");
   }
 
   if (!options.hasOwnProperty("type")) {
