@@ -57,21 +57,27 @@ const processYumlData = (diagramInstructions, options, vizOptions) => {
   }
 
   if (!options.hasOwnProperty("type")) {
-    throw new Error("Error: Missing mandatory 'type' directive");
+    return Promise.reject(
+      new Error("Error: Missing mandatory 'type' directive")
+    );
   }
 
   if (options.type in diagramTypes) {
     const { isDark } = options;
 
-    const renderingFunction = diagramTypes[options.type];
-    const rendered = renderingFunction(diagramInstructions, options);
+    try {
+      const renderingFunction = diagramTypes[options.type];
+      const rendered = renderingFunction(diagramInstructions, options);
 
-    // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
-    return options.type === "sequence"
-      ? Promise.resolve(rendered)
-      : dot2svg(buildDotHeader(isDark) + rendered, vizOptions).then(svg =>
-          processEmbeddedImages(svg, isDark)
-        );
+      // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
+      return options.type === "sequence"
+        ? Promise.resolve(rendered)
+        : dot2svg(buildDotHeader(isDark) + rendered, vizOptions).then(svg =>
+            processEmbeddedImages(svg, isDark)
+          );
+    } catch (err) {
+      return Promise.reject(err);
+    }
   } else {
     return Promise.reject(new Error("Invalid diagram type"));
   }
