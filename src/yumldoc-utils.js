@@ -1,4 +1,5 @@
-const fs = require("fs");
+const readline = require("readline");
+const { Readable } = require("stream");
 
 const dot2svg = require("./dot2svg");
 const processEmbeddedImages = require("./svg-utils");
@@ -22,7 +23,7 @@ const directions = {
 
 /**
  * Generates SVG diagram.
- * @param {string | Buffer} text The yUML document to parse
+ * @param {string | Buffer | Readable} input The yUML document to parse
  * @param {object} [options] - The options to be set for generating the SVG
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
  * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
@@ -30,27 +31,40 @@ const directions = {
  * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
  * @returns {Promise<string>} The rendered diagram as a SVG document
  */
-const processYumlDocument = function(text, options, vizOptions) {
-  if (!options) options = {};
-  if (!options.dir) options.dir = "TB";
-  if (!options.type) options.type = "class";
-  if (!options.isDark) options.isDark = false;
+const processYumlDocument = (input, options, vizOptions) =>
+  new Promise((resolve, reject) => {
+    if (!options) options = {};
+    if (!options.dir) options.dir = "TB";
+    if (!options.type) options.type = "class";
+    if (!options.isDark) options.isDark = false;
 
-  const lines = text
-    .toString()
-    .split(/\r|\n/)
-    .map(line => line.trim());
-  const newlines = [];
+    const diagramInstructions = [];
 
-  for (const line of lines) {
-    if (line.startsWith("//")) {
-      processDirectives(line, options);
-    } else if (line.length > 0) {
-      newlines.push(line);
+    if (input instanceof Readable) {
+      const lineReader = readline.createInterface({ input });
+
+      lineReader.on("line", processLine(options, diagramInstructions));
+      lineReader.on("close", () =>
+        processYumlData(diagramInstructions, options, vizOptions).then(
+          resolve,
+          reject
+        )
+      );
+    } else {
+      input
+        .toString()
+        .split(/\r|\n/)
+        .forEach(processLine(options, diagramInstructions));
+
+      processYumlData(diagramInstructions, options, vizOptions).then(
+        resolve,
+        reject
+      );
     }
-  }
+  });
 
-  if (newlines.length === 0) {
+const processYumlData = (diagramInstructions, options, vizOptions) => {
+  if (diagramInstructions.length === 0) {
     return "";
   }
 
@@ -62,7 +76,7 @@ const processYumlDocument = function(text, options, vizOptions) {
     const { isDark } = options;
 
     const renderingFunction = diagramTypes[options.type];
-    const rendered = renderingFunction(newlines, options);
+    const rendered = renderingFunction(diagramInstructions, options);
 
     // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
     return options.type === "sequence"
@@ -71,7 +85,16 @@ const processYumlDocument = function(text, options, vizOptions) {
           processEmbeddedImages(svg, isDark)
         );
   } else {
-    throw new Error("Invalid diagram type");
+    return Promise.reject(new Error("Invalid diagram type"));
+  }
+};
+
+const processLine = (options, diagramInstructions) => line => {
+  line = line.trim();
+  if (line.startsWith("//")) {
+    processDirectives(line, options);
+  } else if (line.length) {
+    diagramInstructions.push(line);
   }
 };
 
