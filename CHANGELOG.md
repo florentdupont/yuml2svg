@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.0.0
+
+* The API is now promisified due to `Viz.js` v2.
+* Added sequence diagrams support.
+* Solve issue with record shapes and `Graphviz` 2.39+.
+* Add support for `Readable` streams and `Buffer`.
+* The API rejects when a error occurs instead of generating a SVG with error
+  message.
+
+# 3.1
+
+* Expose `options` object to the API
+
 ## 3.0
 
 * Remove global scope uses
