@@ -20,8 +20,7 @@ yarn add yuml2svg
 
 ## yUML syntax
 
-Please refer to the
-[wiki page](https://github.com/jaime-olivares/vscode-yuml/wiki).
+Please refer to the [wiki page](//github.com/jaime-olivares/vscode-yuml/wiki).
 
 ## API
 
@@ -30,8 +29,8 @@ The API exports a function that accepts as arguments:
 1.  A `Readable` stream, a `Buffer` or a `string` containing the yUML diagram.
 2.  An optional plain `object` containing the options for the rendering.
 3.  An optional plain `object` containing the
-    [options for Viz.js](https://github.com/mdaines/viz.js/wiki/2.0.0-API).
-    Check it out if you are using this package in the browser.
+    [options for Viz.js](//github.com/mdaines/viz.js/wiki/2.0.0-API). Check it
+    out if you are using this package in the browser.
 
 The API returns a `Promise` which resolves in a string containing SVG document
 as a `string`.
@@ -47,25 +46,32 @@ as a `string`.
 Here are some examples of a simple usage you can make of the API:
 
 ```js
-import fs from "fs/promises"; // N.B.: fs/promises is not available before Node 10.0.0
+import fs from "fs";
 import yuml2svg from "yuml2svg";
+
+/**
+ * Renders a string or a Buffer into SVG with dark mode
+ * @param {string | Buffer | Readable} yuml The yUML diagram
+ * @returns {Promise<string>} callback The SVG document that represents the yUML diagram
+ */
+const renderDarkSVG = yuml => yuml2svg(yuml, { isDark: true });
 
 /**
  * Renders a given file into a SVG string asynchronously
  * @param {string} filePath Path to the yUML diagram
  * @returns {Promise<string>} callback The SVG document that represents the yUML diagram
  */
-const renderFile = filePath => fs.readFile(filePath).then(yuml2svg);
+const renderFile = filePath => yuml2svg(fs.createReadStream(filePath));
 
 /**
  * Renders a given file into a SVG string asynchronously
  * @param {string} filePath Path to the yUML diagram
  * @param {{dir:string, type: string, isDark: boolean}} [options]
- * @param {{Module:Module, render: Function}} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
+ * @param {object} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
  * @returns {Promise<string>} callback The SVG document that represents the yUML diagram
  */
 const renderFileWithOptions = (filePath, options, vizOptions) =>
-  fs.readFile(filePath).then(yuml => yuml2svg(yuml, options, vizOptions));
+  yuml2svg(fs.createReadStream(filePath), options, vizOptions);
 
 /**
  * Generates a SVG file from a yUML file
@@ -74,8 +80,7 @@ const renderFileWithOptions = (filePath, options, vizOptions) =>
  * @returns {Promise<>} Promise that resolves once the SVG file is written
  */
 const generateSVG = async (inputFile, outputFile) => {
-  const yuml = await fs.readFile(inputFile);
-  const svg = await yuml2svg(yuml);
+  const svg = await yuml2svg(fs.createReadStream(filePath));
 
   return await fs.writeFile(outputFile, svg);
 };
@@ -85,8 +90,21 @@ Or, if you don't like `Promise` nor `async`/`await` syntax, you can use it with
 good old callbacks:
 
 ```js
-const fs = require("fs");
-const yuml2svg = require("yuml2svg");
+var fs = require("fs");
+var yuml2svg = require("yuml2svg");
+
+/**
+ * Renders a string or a Buffer into SVG with dark mode
+ * @param {string | Buffer | Readable} yuml The yUML diagram
+ * @param {(Error, string)=>any} callback Async callback
+ */
+function renderDarkSVG(yuml, callback) {
+  yuml2svg(yuml, { isDark: true })
+    .then(function(svg) {
+      callback(null, svg);
+    })
+    .catch(callback);
+}
 
 /**
  * Renders a given file into a SVG string asynchronously
@@ -105,21 +123,15 @@ function renderFile(filePath, callback) {
  * Renders a given file into a SVG string asynchronously
  * @param {string} filePath Path to the yUML diagram
  * @param {{dir:string, type: string, isDark: boolean}} [options]
- * @param {{Module:Module, render: Function}} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
+ * @param {object} [vizOptions] @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
  * @param {(Error, string)=>any} callback Async callback
  */
 function renderFileWithOptions(filePath, options, vizOptions) {
-  fs.readFile(filePath, function(err, yuml) {
-    if (err) {
-      callback(err);
-    } else {
-      yuml2svg(yuml, options, vizOptions)
-        .then(function(svg) {
-          callback(null, svg);
-        })
-        .catch(callback);
-    }
-  });
+  yuml2svg(fs.createReadStream(filePath), options, vizOptions)
+    .then(function(svg) {
+      callback(null, svg);
+    })
+    .catch(callback);
 }
 
 /**
@@ -129,17 +141,11 @@ function renderFileWithOptions(filePath, options, vizOptions) {
  * @param {(Error)=>any} callback Async callback
  */
 function generateSVG(inputFile, outputFile, callback) {
-  fs.readFile(filePath, function(err, yuml) {
-    if (err) {
-      callback(err);
-    } else {
-      yuml2svg(yuml)
-        .then(function(svg) {
-          fs.writeFile(outputFile, svg, callback);
-        })
-        .catch(callback);
-    }
-  });
+  yuml2svg(fs.createReadStream(filePath))
+    .then(function(svg) {
+      fs.writeFile(outputFile, svg, callback);
+    })
+    .catch(callback);
 }
 ```
 
@@ -153,5 +159,8 @@ You can find a working example of a browser implementation using webpack here:
 
 ## Credits
 
-* Thanks to the [jaime-olivares](https://github.com/jaime-olivares)'s
-  [VSCode extension](https://github.com/jaime-olivares/vscode-yuml)
+* Thanks to the [mdaines](//github.com/mdaines)'s port of
+  [Graphviz](//www.graphviz.org/) for JavaScript
+  [viz.js](//github.com/mdaines/viz.js).
+* Thanks to the [jaime-olivares](//github.com/jaime-olivares)'s
+  [VSCode extension](//github.com/jaime-olivares/vscode-yuml).
