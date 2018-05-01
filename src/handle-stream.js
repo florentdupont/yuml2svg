@@ -9,9 +9,14 @@ if (IS_BROWSER) {
 
   module.exports = (input, processLine) =>
     new Promise((resolve, reject) => {
-      const lineReader = readline.createInterface({ input });
+      const crlfDelay = Infinity; // \r\n are handled as a single newline
+      const lineReader = readline.createInterface({ input, crlfDelay });
 
       lineReader.on("line", processLine);
       lineReader.on("close", resolve);
+
+      // If the input stream is erroneous or already consumed
+      input.on("error", reject);
+      input.on("close", reject);
     });
 }
