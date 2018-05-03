@@ -149,6 +149,25 @@ function generateSVG(inputFile, outputFile, callback) {
 }
 ```
 
+### CLI
+
+You can use the package to transform yUML diagrams to SVG via the Command-Line
+Interface.
+
+```bash
+# You can install the package globally (or use npx)
+yarn global add yuml2svg
+
+# Print SVG document on the standard output
+cat diagram.yuml | yuml2svg
+
+# Save SVG file to the disk
+cat diagram.yuml | yuml2svg > diagram.svg
+
+# Save SVG file to the disk using dark mode
+cat diagram.yuml | yuml2svg --dark > diagram.svg
+```
+
 ### Run on the browser
 
 You can find a working example of a browser implementation using webpack here:

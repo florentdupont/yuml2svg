@@ -29,6 +29,9 @@
     "markdown"
   ],
   "main": "./index.js",
+  "bin": {
+    "yuml2svg": "bin/yuml2svg.js"
+  },
   "scripts": {
     "lint": "eslint ./src/"
   },
