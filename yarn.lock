@@ -79,8 +79,8 @@
     to-fast-properties "^2.0.0"
 
 "@types/node@^6.0.40":
-  version "6.0.106"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.106.tgz#391bc3598ab5823563f7155847212152893edcd7"
+  version "6.0.107"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.107.tgz#917613ed129a5fd6601dc4b644c4c324aaad4f4c"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -920,8 +920,8 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
 jsdom@^11.6.2:
-  version "11.9.0"
-  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-11.9.0.tgz#58ac6dfd248d560d736b0202d74eedad55590cd9"
+  version "11.10.0"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-11.10.0.tgz#a42cd54e88895dc765f03f15b807a474962ac3b5"
   dependencies:
     abab "^1.0.4"
     acorn "^5.3.0"
@@ -1274,11 +1274,11 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-safe-buffer@^5.0.1, safe-buffer@^5.1.1:
+safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
 
-safe-buffer@~5.1.0, safe-buffer@~5.1.1:
+safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
 
@@ -1485,8 +1485,8 @@ verror@1.10.0:
     extsprintf "^1.2.0"
 
 viz.js@^2.0.0-pre.5:
-  version "2.0.0-pre.5"
-  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-2.0.0-pre.5.tgz#75a5e0898653cc82fd4bbe1a1a2cb6c5388cfcca"
+  version "2.0.0-pre.6"
+  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-2.0.0-pre.6.tgz#5c435019c6a406567d14520d40bb024dd7d2e65e"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"
