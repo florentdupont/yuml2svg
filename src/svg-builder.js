@@ -1,3 +1,5 @@
+"use strict";
+
 const getDOMWindow = require("./get-dom-window");
 
 const NS = "http://www.w3.org/2000/svg";

@@ -1,3 +1,5 @@
+"use strict";
+
 const shapes = {
   actor: {
     svgNodes: [

@@ -1,11 +1,11 @@
-if (typeof IS_BROWSER === "undefined") IS_BROWSER = false;
+"use strict";
 
 /**
  * @returns {Window} Should work on Node as on the browser
  */
-if (IS_BROWSER) {
-  module.exports = () => window;
-} else {
+if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
   const { JSDOM } = require("jsdom");
   module.exports = () => new JSDOM().window;
+} else {
+  module.exports = () => window;
 }

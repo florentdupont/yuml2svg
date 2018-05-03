@@ -1,9 +1,6 @@
-if (typeof IS_BROWSER === "undefined") IS_BROWSER = false;
+"use strict";
 
-if (IS_BROWSER) {
-  module.exports = (input, processLine) =>
-    Promise.reject(new Error("Not implemented yet"));
-} else {
+if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
   const readline = require("readline");
   const { Readable } = require("stream");
 
@@ -19,4 +16,7 @@ if (IS_BROWSER) {
       input.on("error", reject);
       input.on("close", reject);
     });
+} else {
+  module.exports = (input, processLine) =>
+    Promise.reject(new Error("Not implemented yet"));
 }

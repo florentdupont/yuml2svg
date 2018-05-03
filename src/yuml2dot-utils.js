@@ -1,3 +1,5 @@
+"use strict";
+
 const Color = require("color");
 
 const escape_label = function(label) {

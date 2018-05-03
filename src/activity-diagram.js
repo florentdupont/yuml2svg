@@ -1,3 +1,5 @@
+"use strict";
+
 const {
   escape_label,
   extractBgAndNote,

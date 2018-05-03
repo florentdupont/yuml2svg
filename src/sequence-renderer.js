@@ -1,3 +1,5 @@
+"use strict";
+
 const svg_builder = require("./svg-builder.js");
 
 /*

@@ -1,3 +1,5 @@
+"use strict";
+
 const handleStream = require("./handle-stream");
 const dot2svg = require("./dot2svg");
 const processEmbeddedImages = require("./svg-utils");

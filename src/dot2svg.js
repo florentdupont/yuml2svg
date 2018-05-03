@@ -1,8 +1,8 @@
+"use strict";
+
 const Viz = require("viz.js");
 
-if (typeof IS_BROWSER === "undefined") IS_BROWSER = false;
-
-if (!IS_BROWSER) {
+if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
   var { Module, render } = require("viz.js/full.js.opaque");
 }
 
