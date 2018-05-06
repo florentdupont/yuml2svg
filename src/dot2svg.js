@@ -8,6 +8,12 @@ if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
 }
 
 module.exports = (dot, vizOptions) => {
-  const rendered = vizOptions ? new Viz(vizOptions) : viz;
-  return viz.renderString(dot);
+  const renderer = vizOptions ? new Viz(vizOptions) : viz;
+  return renderer.renderString(dot).catch(err => {
+    /** @see https://github.com/mdaines/viz.js/wiki/2.0.0-Caveats */
+    if (!vizOptions) {
+      viz = new Viz({ Module, render });
+    }
+    throw err;
+  });
 };
