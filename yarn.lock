@@ -79,8 +79,8 @@
     to-fast-properties "^2.0.0"
 
 "@types/node@^6.0.40":
-  version "6.0.107"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.107.tgz#917613ed129a5fd6601dc4b644c4c324aaad4f4c"
+  version "6.0.108"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.108.tgz#852e8496bcfc5e74cae83a5eb3b30e5661e9b7b9"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -1484,9 +1484,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-viz.js@^2.0.0-pre.5:
-  version "2.0.0-pre.6"
-  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-2.0.0-pre.6.tgz#5c435019c6a406567d14520d40bb024dd7d2e65e"
+viz.js@2.0.0-pre.8:
+  version "2.0.0-pre.8"
+  resolved "https://registry.yarnpkg.com/viz.js/-/viz.js-2.0.0-pre.8.tgz#cf9a3a256cfd04c3458d39ba46a4a8f11fed7634"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

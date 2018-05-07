@@ -3,7 +3,7 @@
 const Viz = require("viz.js");
 
 if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
-  var { Module, render } = require("viz.js/full.js.opaque");
+  var { Module, render } = require("viz.js/full.render");
   var viz = new Viz({ Module, render });
 }
 
