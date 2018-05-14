@@ -28,10 +28,18 @@ const directions = {
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
  * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
  * @param {string} [options.isDark] - Option to get dark or light diagram
- * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/2.0.0-API
- * @returns {Promise<string>} The rendered diagram as a SVG document
+ * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/API#new-vizoptions (should be undefined for back-end rendering)
+ * @param {string} [vizOptions.workerUrl] - URL of one of the rendering script files
+ * @param {Worker} [vizOptions.worker] - Worker instance constructed with the URL or path of one of the rendering script files
+ * @param {object} [renderOptions] - @see https://github.com/mdaines/viz.js/wiki/API#render-options
+ * @param {string} [renderOptions.engine] - layout engine
+ * @param {string} [renderOptions.format] - desired output format (only "svg" is supported)
+ * @param {boolean} [renderOptions.yInvert] - invert the y coordinate in output
+ * @param {object[]} [renderOptions.images] - image dimensions to use when rendering nodes with image attributes
+ * @param {object[]} [renderOptions.files] - files to make available to Graphviz using Emscripten's in-memory filesystem
+ * @returns {Promise<string>} The rendered diagram as a SVG document (or other format if specified in renderOptions)
  */
-const processYumlDocument = (input, options, vizOptions) => {
+const processYumlDocument = (input, options, vizOptions, renderOptions) => {
   if (!options) options = {};
   if (!options.dir) options.dir = "TB";
   if (!options.type) options.type = "class";
@@ -41,7 +49,8 @@ const processYumlDocument = (input, options, vizOptions) => {
 
   if (input.read && "function" === typeof input.read) {
     return handleStream(input, processLine(options, diagramInstructions)).then(
-      () => processYumlData(diagramInstructions, options, vizOptions)
+      () =>
+        processYumlData(diagramInstructions, options, vizOptions, renderOptions)
     );
   } else {
     input
@@ -49,11 +58,21 @@ const processYumlDocument = (input, options, vizOptions) => {
       .split(/\r|\n/)
       .forEach(processLine(options, diagramInstructions));
 
-    return processYumlData(diagramInstructions, options, vizOptions);
+    return processYumlData(
+      diagramInstructions,
+      options,
+      vizOptions,
+      renderOptions
+    );
   }
 };
 
-const processYumlData = (diagramInstructions, options, vizOptions) => {
+const processYumlData = (
+  diagramInstructions,
+  options,
+  vizOptions,
+  renderOptions
+) => {
   if (diagramInstructions.length === 0) {
     return Promise.resolve("");
   }
@@ -74,9 +93,11 @@ const processYumlData = (diagramInstructions, options, vizOptions) => {
       // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
       return options.type === "sequence"
         ? Promise.resolve(rendered)
-        : dot2svg(buildDotHeader(isDark) + rendered, vizOptions).then(svg =>
-            processEmbeddedImages(svg, isDark)
-          );
+        : dot2svg(
+            buildDotHeader(isDark) + rendered,
+            vizOptions,
+            renderOptions
+          ).then(svg => processEmbeddedImages(svg, isDark));
     } catch (err) {
       return Promise.reject(err);
     }
