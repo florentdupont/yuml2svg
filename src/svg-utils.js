@@ -14,6 +14,9 @@ const shapes = {
   },
 };
 
+const WHITE = "#fff";
+const BLACK = "#000";
+
 /**
  * Process embedded shapes {img:shapeName}
  * @param {string} svg The SVG document to parse
@@ -29,25 +32,16 @@ module.exports = function(svg, isDark) {
 
       if (shapeName in shapes) {
         const img = shapes[shapeName];
-        const [
-          _,
-          translateX,
-          translateY,
-        ] = /<text\s.*x=\"(-?[0-9\.]+)\" y=\"(-?[0-9\.]+)\"/.exec(textNode);
+        const [xAttr, translateX] = /\sx=\"(-?[0-9\.]+)\"/.exec(attributes);
+        const [yAttr, translateY] = /\sy=\"(-?[0-9\.]+)\"/.exec(attributes);
 
         return (
           `<g transform="translate(${translateX}, ${translateY})" style="fill:none;stroke:${
-            isDark ? "white" : "black"
-          };stroke-width:1px">${img.svgNodes.join("")}</g>\n` +
+            isDark ? WHITE : BLACK
+          };stroke-width:1px">${img.svgNodes.join("")}</g>` +
           textNode
-            .replace(
-              ' x="' + translateX + '"',
-              ' x="' + (parseFloat(translateX) + img.translateX) + '"'
-            )
-            .replace(
-              ' y="' + translateY + '"',
-              ' y="' + (parseFloat(translateY) + img.translateY) + '"'
-            )
+            .replace(xAttr, ` x="${parseFloat(translateX) + img.translateX}"`)
+            .replace(yAttr, ` y="${parseFloat(translateY) + img.translateY}"`)
         );
       } else {
         console.warn(new Error(`Unknown shape '${shapeName}'`));
