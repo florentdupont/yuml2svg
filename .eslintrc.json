@@ -9,8 +9,10 @@
     "ecmaVersion": 2015,
     "sourceType": "module"
   },
-  "extends": ["prettier"],
+  "extends": ["plugin:prettier/recommended"],
   "rules": {
+    "comma-dangle": ["error", "always-multiline"],
+    "eol-last": ["error", "always"],
     "no-throw-literal": "error"
   }
 }
