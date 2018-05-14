@@ -3,6 +3,11 @@
 const getDOMWindow = require("./get-dom-window");
 
 const NS = "http://www.w3.org/2000/svg";
+const FONT_SIZE = 18;
+const CHAR_WIDTH = 8.5;
+
+const WHITE = "#fff";
+const BLACK = "#000";
 
 module.exports = function(isDark) {
   const { document } = getDOMWindow();
@@ -25,7 +30,7 @@ module.exports = function(isDark) {
     rect.setAttribute("height", height);
     rect.setAttribute(
       "style",
-      "stroke-width: 1; fill: none; stroke: " + (isDark ? "white;" : "black;")
+      `stroke-width:1;fill:none;stroke:${isDark ? WHITE : BLACK};`
     );
 
     return rect;
@@ -35,19 +40,19 @@ module.exports = function(isDark) {
     const g = document.createElementNS(NS, "g");
     const lines = message.split("\n");
 
-    y -= (lines.length - 1) / 2 * 18;
+    y -= (lines.length - 1) / 2 * FONT_SIZE;
 
-    for (let i = 0; i < lines.length; i++) {
+    for (const lineText of lines) {
       const text = document.createElementNS(NS, "text");
-      text.textContent = lines[i];
-      text.setAttribute("fill", color || isDark ? "white" : "black");
+      text.textContent = lineText;
+      text.setAttribute("fill", color || isDark ? WHITE : BLACK);
 
       text.setAttribute("x", x);
       text.setAttribute("y", y);
       text.style.textAnchor = "middle";
       text.style.alignmentBaseline = "central";
 
-      y += 18;
+      y += FONT_SIZE;
 
       g.appendChild(text);
     }
@@ -56,17 +61,13 @@ module.exports = function(isDark) {
   };
 
   this.getTextSize = function(text) {
-    let width = 0;
     const lines = text.split("\n");
+    const width = CHAR_WIDTH * Math.max(...lines.map(line => line.length));
 
-    for (let i = 0; i < lines.length; i++) {
-      width = Math.max(width, 8.5 * lines[i].length);
-    }
-
-    return { x: 0, y: 0, width, height: 18 * lines.length };
+    return { x: 0, y: 0, width, height: FONT_SIZE * lines.length };
   };
 
-  this.createPath = function(format, linetype) {
+  this.createPath = function(format, lineType) {
     const args = arguments;
     const pathSpec = format.replace(/\{(\d+)\}/g, function(string, index) {
       return args[parseInt(index) + 2];
@@ -76,10 +77,12 @@ module.exports = function(isDark) {
     path.setAttribute("d", pathSpec);
     path.setAttribute(
       "style",
-      "stroke-width: 1; fill: none; stroke: " + (isDark ? "white;" : "black;")
+      `stroke-width:1;fill:none;stroke:${isDark ? WHITE : BLACK};`
     );
 
-    if (linetype === "dashed") path.setAttribute("stroke-dasharray", "7,4");
+    if (lineType === "dashed") {
+      path.setAttribute("stroke-dasharray", "7,4");
+    }
 
     return path;
   };
