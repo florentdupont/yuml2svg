@@ -34,7 +34,7 @@ const directions = {
  * @param {object} [renderOptions] - @see https://github.com/mdaines/viz.js/wiki/API#render-options
  * @param {string} [renderOptions.engine] - layout engine
  * @param {string} [renderOptions.format] - desired output format (only "svg" is supported)
- * @param {boolean} [renderOptions.yInvert] - invert the y coordinate in output
+ * @param {boolean} [renderOptions.yInvert] - invert the y coordinate in output (not supported with "svg" format output)
  * @param {object[]} [renderOptions.images] - image dimensions to use when rendering nodes with image attributes
  * @param {object[]} [renderOptions.files] - files to make available to Graphviz using Emscripten's in-memory filesystem
  * @returns {Promise<string>} The rendered diagram as a SVG document (or other format if specified in renderOptions)

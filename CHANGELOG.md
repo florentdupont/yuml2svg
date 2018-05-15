@@ -2,7 +2,8 @@
 
 ## 4.0.0
 
-* The API is now promisified due to `Viz.js` v2.
+* The API is now promisified due to `Viz.js` v2
+  ([huge performance boost](https://github.com/mdaines/viz.js/issues/120#issuecomment-389281407)).
 * Added sequence diagrams support.
 * Solve issue with record shapes and `Graphviz` 2.39+.
 * Add support for `Readable` streams and `Buffer`.

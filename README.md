@@ -29,19 +29,24 @@ The API exports a function that accepts as arguments:
 1.  A `Readable` stream, a `Buffer` or a `string` containing the yUML diagram.
 2.  An optional plain `object` containing the options for the rendering.
 3.  An optional plain `object` containing the
-    [options for Viz.js](//github.com/mdaines/viz.js/wiki/2.0.0-API). Check it
-    out if you are using this package in the browser.
+    [options for Viz.js](//github.com/mdaines/viz.js/wiki/2.0.0-API#new-vizoptions).
+    Check it out if you are using this package in the browser.
+4.  An optional plain `object` containing the
+    [render options for Viz.js](//github.com/mdaines/viz.js/wiki/2.0.0-API#render-options).
 
 The API returns a `Promise` which resolves in a string containing SVG document
 as a `string`.
 
 > The options for the rendering are:
 >
-> * `dir`: The direction of the diagram "TB" (default) - topDown, "LR" -
->   leftToRight, "RL" - rightToLeft
-> * `type`: The type of SVG - "class" (default), "usecase", "activity", "state",
->   "deployment", "package".
-> * `isDark`: Option to get dark or light diagram
+> * `dir`: `string` The direction of the diagram "TB" (default) - topDown,
+>   "LR" - leftToRight, "RL" - rightToLeft
+> * `type`: `string` The type of SVG - "class" (default), "usecase", "activity",
+>   "state", "deployment", "package".
+> * `isDark`: `boolean` Option to get dark or light diagram
+>
+> Please check out [Viz.js wiki](//github.com/mdaines/viz.js/wiki/2.0.0-API) to
+> get more the documentation of the last two parameters.
 
 Here are some examples of a simple usage you can make of the API:
 
