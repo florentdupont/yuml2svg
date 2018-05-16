@@ -1,6 +1,4 @@
-"use strict";
-
-const getDOMWindow = require("./get-dom-window");
+import getDOMWindow from "./get-dom-window";
 
 const NS = "http://www.w3.org/2000/svg";
 const FONT_SIZE = 18;
@@ -9,7 +7,7 @@ const CHAR_WIDTH = 8.5;
 const WHITE = "#fff";
 const BLACK = "#000";
 
-module.exports = function(isDark) {
+export default function(isDark) {
   const { document } = getDOMWindow();
   const svgElement = document.createElement("svg");
   svgElement.setAttribute("xmlns", NS);
@@ -90,4 +88,4 @@ module.exports = function(isDark) {
   this.serialize = function() {
     return this.getDocument().outerHTML;
   };
-};
+}

@@ -1,12 +1,6 @@
-"use strict";
-
-const {
-  extractBgAndNote,
-  formatLabel,
-  splitYumlExpr,
-} = require("./yuml2dot-utils");
-const UIDHandler = require("./uidHandler");
-const Renderer = require("./sequence-renderer");
+import { extractBgAndNote, formatLabel, splitYumlExpr } from "./yuml2dot-utils";
+import UIDHandler from "./uidHandler";
+import Renderer from "./sequence-renderer";
 
 /*
 Unofficial syntax, based on a proposal specified in the Scruffy project, plus local additions
@@ -168,4 +162,4 @@ function composeSVG(specLines, options) {
   return renderer.svg_.serialize();
 }
 
-module.exports = composeSVG;
+export default composeSVG;
