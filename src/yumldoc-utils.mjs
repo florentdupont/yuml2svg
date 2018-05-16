@@ -48,8 +48,9 @@ export default (input, options, vizOptions, renderOptions) => {
 
   if (input.read && "function" === typeof input.read) {
     return import(handleStream)
-      .then(module =>
-        module.default(input, processLine(options, diagramInstructions))
+      .then(module => module.default)
+      .then(handleStream =>
+        handleStream(input, processLine(options, diagramInstructions))
       )
       .then(() =>
         processYumlData(diagramInstructions, options, vizOptions, renderOptions)

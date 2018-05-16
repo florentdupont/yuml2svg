@@ -153,13 +153,13 @@ function composeSVG(specLines, options) {
     }
   }
 
-  const renderer = new Renderer(
-    actors,
-    signals,
-    uidHandler._uids,
-    options.isDark
-  );
-  return renderer.svg_.serialize();
+  return import("./sequence-renderer")
+    .then(module => module.default)
+    .then(
+      Renderer =>
+        new Renderer(actors, signals, uidHandler._uids, options.isDark)
+    )
+    .then(renderer => renderer.svg_.serialize());
 }
 
 export default composeSVG;

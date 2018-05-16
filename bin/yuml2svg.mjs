@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-"use strict";
-
 if (process.stdin.isTTY) {
   console.log("Usage: cat diagram.yuml | yuml2svg > diagram.svg");
   console.log("\tTakes yUML diagram via stdin and outputs SVG to stdout.");
