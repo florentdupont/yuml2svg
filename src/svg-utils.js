@@ -24,28 +24,27 @@ const BLACK = "#000";
  * @returns {string} SVG document embedding shapes
  */
 module.exports = function(svg, isDark) {
-  const expr = /<text\s(.*)>{img:(.*)}(.*)<\/text>/g;
+  const expr = /<text(\s.*)>{img:(.*)}(.*)<\/text>/g;
 
   return svg.replace(expr, function(match, attributes, shapeName, label) {
     try {
-      const textNode = `<text ${attributes}>${label.trim()}</text>`;
-
       if (shapeName in shapes) {
         const img = shapes[shapeName];
         const [xAttr, translateX] = /\sx=\"(-?[0-9\.]+)\"/.exec(attributes);
         const [yAttr, translateY] = /\sy=\"(-?[0-9\.]+)\"/.exec(attributes);
 
         return (
-          `<g transform="translate(${translateX}, ${translateY})" style="fill:none;stroke:${
+          `<g transform="translate(${translateX},${translateY})" style="fill:none;stroke:${
             isDark ? WHITE : BLACK
-          };stroke-width:1px">${img.svgNodes.join("")}</g>` +
-          textNode
+          };stroke-width:1px">${img.svgNodes.join("")}</g><text` +
+          attributes
             .replace(xAttr, ` x="${parseFloat(translateX) + img.translateX}"`)
-            .replace(yAttr, ` y="${parseFloat(translateY) + img.translateY}"`)
+            .replace(yAttr, ` y="${parseFloat(translateY) + img.translateY}"`) +
+          `>${label.trim()}</text>`
         );
       } else {
         console.warn(new Error(`Unknown shape '${shapeName}'`));
-        return textNode;
+        return match;
       }
     } catch (e) {
       console.warn(e);
