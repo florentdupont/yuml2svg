@@ -2,7 +2,6 @@
 
 if (typeof IS_BROWSER === "undefined" || !IS_BROWSER) {
   const readline = require("readline");
-  const { Readable } = require("stream");
 
   module.exports = (input, processLine) =>
     new Promise((resolve, reject) => {
