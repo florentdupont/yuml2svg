@@ -9,6 +9,7 @@
 * Add support for `Readable` streams and `Buffer`.
 * The API rejects when a error occurs instead of generating a SVG with error
   message.
+* Lazy load rendering modules to improve startup time
 
 # 3.1
 
