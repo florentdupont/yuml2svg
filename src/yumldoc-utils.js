@@ -1,18 +1,17 @@
 "use strict";
 
-const handleStream = require("./handle-stream");
-const dot2svg = require("./dot2svg");
-const processEmbeddedImages = require("./svg-utils");
-const { buildDotHeader } = require("./yuml2dot-utils");
+const handleStream = "./handle-stream";
+const dot2svg = "./dot2svg";
+const processEmbeddedImages = "./svg-utils";
 
 const diagramTypes = {
-  class: require("./class-diagram"),
-  usecase: require("./usecase-diagram"),
-  activity: require("./activity-diagram"),
-  state: require("./state-diagram"),
-  deployment: require("./deployment-diagram"),
-  package: require("./package-diagram"),
-  sequence: require("./sequence-diagram"),
+  class: "./class-diagram",
+  usecase: "./usecase-diagram",
+  activity: "./activity-diagram",
+  state: "./state-diagram",
+  deployment: "./deployment-diagram",
+  package: "./package-diagram",
+  sequence: "./sequence-diagram",
 };
 
 const directions = {
@@ -48,9 +47,11 @@ const processYumlDocument = (input, options, vizOptions, renderOptions) => {
   const diagramInstructions = [];
 
   if (input.read && "function" === typeof input.read) {
-    return handleStream(input, processLine(options, diagramInstructions)).then(
-      () =>
-        processYumlData(diagramInstructions, options, vizOptions, renderOptions)
+    return require(handleStream)(
+      input,
+      processLine(options, diagramInstructions)
+    ).then(() =>
+      processYumlData(diagramInstructions, options, vizOptions, renderOptions)
     );
   } else {
     input
@@ -87,17 +88,20 @@ const processYumlData = (
     const { isDark } = options;
 
     try {
-      const renderingFunction = diagramTypes[options.type];
+      const renderingFunction = require(diagramTypes[options.type]);
       const rendered = renderingFunction(diagramInstructions, options);
 
       // Sequence diagrams are rendered as SVG, not dot file -- and have no embedded images (I guess)
-      return options.type === "sequence"
-        ? Promise.resolve(rendered)
-        : dot2svg(
-            buildDotHeader(isDark) + rendered,
-            vizOptions,
-            renderOptions
-          ).then(svg => processEmbeddedImages(svg, isDark));
+      if (options.type === "sequence") {
+        return Promise.resolve(rendered);
+      } else {
+        const { buildDotHeader } = require("./yuml2dot-utils");
+        return require(dot2svg)(
+          buildDotHeader(isDark) + rendered,
+          vizOptions,
+          renderOptions
+        ).then(svg => require(processEmbeddedImages)(svg, isDark));
+      }
     } catch (err) {
       return Promise.reject(err);
     }
