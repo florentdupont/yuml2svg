@@ -3,63 +3,52 @@
 const Color = require("color");
 
 const escape_label = function(label) {
-  let newlabel = "";
-  for (let i = 0; i < label.length; i++)
-    newlabel += replaceChar(label.charAt(i));
+  const ESCAPED_CHARS = {
+    "{": "\\{",
+    "}": "\\}",
+    ";": "\\n",
+    " ": "\\ ",
+    "<": "\\<",
+    ">": "\\>",
+  };
 
-  function replaceChar(c) {
-    c = c.replace("{", "\\{").replace("}", "\\}");
-    c = c.replace(";", "\\n");
-    c = c.replace(" ", "\\ ");
-    c = c.replace("<", "\\<").replace(">", "\\>");
-    // c = c.replace('\\n\\n', '\\n');
-    return c;
+  let newLabel = "";
+  for (const char of label) {
+    newLabel += ESCAPED_CHARS[char] || char;
   }
 
-  return newlabel;
+  return newLabel;
 };
 
 const splitYumlExpr = function(line, separators, escape = "\\") {
+  const SEPARATOR_END = {
+    "[": "]",
+    "(": ")",
+    "|": "|",
+  };
+
   let word = "";
-  let lastChar = null;
+  let lastChar;
   const parts = [];
 
   for (let i = 0; i < line.length; i++) {
-    let currentWord = line[i];
+    const currentChar = line[i];
 
-    if (currentWord === escape && i + 1 < line.length) {
-      word += currentWord;
-      word += line[++i];
-    } else if (separators.indexOf(currentWord) >= 0 && lastChar === null) {
+    if (currentChar === escape && i + 1 < line.length) {
+      word += currentChar + line[++i];
+    } else if (separators.includes(currentChar) && lastChar === undefined) {
       if (word.length > 0) {
         parts.push(word.trim());
-        word = "";
       }
 
-      switch (currentWord) {
-        case "[":
-          lastChar = "]";
-          break;
-        case "(":
-          lastChar = ")";
-          break;
-        case "<":
-          lastChar = ">";
-          break;
-        case "|":
-          lastChar = "|";
-          break;
-        default:
-          lastChar = null;
-          break;
-      }
-      word = currentWord;
-    } else if (currentWord === lastChar) {
-      lastChar = null;
-      parts.push(word.trim() + currentWord);
+      lastChar = SEPARATOR_END[currentChar];
+      word = currentChar;
+    } else if (currentChar === lastChar) {
+      lastChar = undefined;
+      parts.push(word.trim() + currentChar);
       word = "";
     } else {
-      word += currentWord;
+      word += currentChar;
     }
   }
 
@@ -98,21 +87,17 @@ const unescape_token_escapes = function(spec) {
   return spec.replace("\\u005b", "[").replace("\\u005d", "]");
 };
 
-const recordName = function(label) {
-  return label.split("|")[0].trim();
-};
+const recordName = label =>
+  (label.includes("|") ? label.substr(0, label.indexOf("|")) : label).trim();
 
 const formatLabel = function(label, wrap, allowDivisors) {
-  let lines = [label];
+  const DIVISOR = "|";
+  const lines =
+    allowDivisors && label.includes(DIVISOR) ? label.split(DIVISOR) : [label];
 
-  if (allowDivisors && label.indexOf("|") >= 0) lines = label.split("|");
-
-  for (let j = 0; j < lines.length; j++)
-    lines[j] = wordwrap(lines[j], wrap, "\\n");
-
-  label = lines.join("|");
-
-  return escape_label(label);
+  return escape_label(
+    lines.map(line => wordwrap(line, wrap, "\\n")).join(DIVISOR)
+  );
 };
 
 const wordwrap = function(str, width, newline) {
@@ -154,7 +139,7 @@ const serializeDot = function(node) {
 const serializeDotElements = function(arr) {
   let dot = "";
 
-  for (let record of arr) {
+  for (const record of arr) {
     if (record.length === 2)
       dot += `    ${record[0]} ${serializeDot(record[1])}\n`;
     else if (record.length === 3)

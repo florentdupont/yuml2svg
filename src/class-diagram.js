@@ -33,14 +33,10 @@ function parseYumlExpr(specLine) {
   const exprs = [];
   const parts = splitYumlExpr(specLine, "[");
 
-  for (let i = 0; i < parts.length; i++) {
-    let part = parts[i].trim();
-    if (part.length === 0) continue;
-
-    if (part.match(/^\[.*\]$/)) {
+  for (const part of parts) {
+    if (/^[.*]$/.test(part)) {
       // class box
-      part = part.substr(1, part.length - 2);
-      const ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(part.substr(1, part.length - 2), true);
       exprs.push([
         ret.isNote ? "note" : "record",
         ret.part,
@@ -66,9 +62,7 @@ function parseYumlExpr(specLine) {
       if (tokens.length !== 2)
         throw new Error(`Invalid expression - ${JSON.stringify(tokens)}.`);
 
-      const left = tokens[0];
-      const right = tokens[1];
-      let lstyle, ltext, rstyle, rtext;
+      const [left, right] = tokens;
 
       const processLeft = function(left) {
         if (left.startsWith("<>")) return ["odiamond", left.substring(2)];
@@ -79,9 +73,8 @@ function parseYumlExpr(specLine) {
         else if (left.startsWith("^")) return ["empty", left.substring(1)];
         else return ["none", left];
       };
-      tokens = processLeft(left);
-      lstyle = tokens[0];
-      ltext = tokens[1];
+
+      const [leftStyle, leftText] = processLeft(left);
 
       const processRight = function(right) {
         const len = right.length;
@@ -98,11 +91,10 @@ function parseYumlExpr(specLine) {
           return ["empty", right.substring(0, len - 1)];
         else return processLeft(right);
       };
-      tokens = processRight(right);
-      rstyle = tokens[0];
-      rtext = tokens[1];
 
-      exprs.push(["edge", lstyle, ltext, rstyle, rtext, style]);
+      const [rightStyle, rightText] = processRight(right);
+
+      exprs.push(["edge", leftStyle, leftText, rightStyle, rightText, style]);
     } else throw new Error(`Invalid expression - ${part}.`);
   }
 
