@@ -120,6 +120,18 @@ const serializeDot = function(node) {
     // Also note that there are problems using non-trivial edges (edges with ports or labels) between adjacent nodes
     // on the same rank if one or both nodes has a record shape.
 
+    if (node.label.includes("|")) {
+      // If label contains a pipe, we need to use an HTML-like label
+      return (
+        '[label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9">' +
+        node.label
+          .split("|")
+          .map(text => `<TR><TD>${text.replace("\\n", "<BR/>")}</TD></TR>`)
+          .join("") +
+        "</TABLE>>]"
+      );
+    }
+
     // To avoid this issue, we can use a "rectangle" shape
     node.shape = "rectangle";
   }
@@ -149,20 +161,13 @@ const serializeDotElements = function(arr) {
   return dot;
 };
 
-const buildDotHeader = function(isDark) {
-  let header = "digraph G {\n";
-
-  if (isDark) {
-    header += "  graph [ bgcolor=transparent, fontname=Helvetica ]\n";
-    header += "  node [ color=white, fontcolor=white, fontname=Helvetica ]\n";
-    header += "  edge [ color=white, fontcolor=white, fontname=Helvetica ]\n";
-  } else {
-    header += "  graph [ fontname=Helvetica ]\n";
-    header += "  node [ fontname=Helvetica ]\n";
-    header += "  edge [ fontname=Helvetica ]\n";
-  }
-  return header;
-};
+const buildDotHeader = isDark => `digraph G{
+    graph[fontname=Helvetica${isDark ? ",bgcolor=transparent" : ""}]
+    node[shape=none,margin=0,fontname=Helvetica${
+      isDark ? ",color=white,fontcolor=white" : ""
+    }]
+    edge[fontname=Helvetica${isDark ? ",color=white,fontcolor=white" : ""}]
+  `;
 
 module.exports = {
   buildDotHeader,
