@@ -1,17 +1,26 @@
 # yUML to SVG
 
+[![npm](https://img.shields.io/npm/v/yuml2svg.svg)](https://www.npmjs.com/package/yuml2svg)
+
+This project is a fork of
+[jaime-olivares/yuml-diagram](https://www.npmjs.com/package/yuml-diagram). You
+might want to check it out if you are more interested in a synchronous version
+of the API.
+
 ## Installation
 
-You can install it with npm:
+You can install it with yarn:
 
 ```bash
-npm install yuml2svg
+yarn global add yuml2svg # For CLI usage
+yarn add yuml2svg # As local dependency
 ```
 
-Or with yarn:
+Or with npm:
 
 ```bash
-yarn add yuml2svg
+npm --global install yuml2svg # For CLI usage
+npm install yuml2svg --save # As local dependency
 ```
 
 ## Features
@@ -20,9 +29,30 @@ yarn add yuml2svg
 
 ## yUML syntax
 
-Please refer to the [wiki page](//github.com/jaime-olivares/vscode-yuml/wiki).
+Please refer to the [wiki page](//github.com/jaime-olivares/yuml-diagram/wiki).
 
-## API
+## Usage
+
+### CLI
+
+You can use the package to transform yUML diagrams to SVG via the Command-Line
+Interface.
+
+```bash
+# You can install the package globally (or use npx)
+yarn global add yuml2svg
+
+# Print SVG document on the standard output
+cat diagram.yuml | yuml2svg
+
+# Save SVG file to the disk
+cat diagram.yuml | yuml2svg > diagram.svg
+
+# Save SVG file to the disk using dark mode
+cat diagram.yuml | yuml2svg --dark > diagram.svg
+```
+
+### Node.JS API
 
 The API exports a function that accepts as arguments:
 
@@ -87,7 +117,7 @@ const renderFileWithOptions = (filePath, options, vizOptions) =>
 const generateSVG = async (inputFile, outputFile) => {
   const svg = await yuml2svg(fs.createReadStream(filePath));
 
-  return await fs.writeFile(outputFile, svg);
+  return await fs.promises.writeFile(outputFile, svg);
 };
 ```
 
@@ -152,25 +182,6 @@ function generateSVG(inputFile, outputFile, callback) {
     })
     .catch(callback);
 }
-```
-
-### CLI
-
-You can use the package to transform yUML diagrams to SVG via the Command-Line
-Interface.
-
-```bash
-# You can install the package globally (or use npx)
-yarn global add yuml2svg
-
-# Print SVG document on the standard output
-cat diagram.yuml | yuml2svg
-
-# Save SVG file to the disk
-cat diagram.yuml | yuml2svg > diagram.svg
-
-# Save SVG file to the disk using dark mode
-cat diagram.yuml | yuml2svg --dark > diagram.svg
 ```
 
 ### Run on the browser
