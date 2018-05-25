@@ -23,6 +23,7 @@ const escape_label = function(label) {
 const splitYumlExpr = function(line, separators, escape = "\\") {
   const SEPARATOR_END = {
     "[": "]",
+    "<": ">",
     "(": ")",
     "|": "|",
   };

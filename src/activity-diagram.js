@@ -30,32 +30,34 @@ function parseYumlExpr(specLine) {
   const exprs = [];
   const parts = splitYumlExpr(specLine, "(<|");
 
-  for (let i = 0; i < parts.length; i++) {
-    let part = parts[i].trim();
-    if (part.length === 0) continue;
-
-    if (part.match(/^\(.*\)$/)) {
+  for (const part of parts) {
+    if (/^\(.*\)$/.test(part)) {
       // activity
-      part = part.substr(1, part.length - 2);
-      const ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(
+        part.substr(1, part.length - 2).trim(),
+        true
+      );
       exprs.push([
         ret.isNote ? "note" : "record",
         ret.part,
         ret.bg,
         ret.fontcolor,
       ]);
-    } else if (part.match(/^<.*>$/)) {
+    } else if (/^<.*>$/.test(part)) {
       // decision
-      part = part.substr(1, part.length - 2);
-      exprs.push(["diamond", part]);
-    } else if (part.match(/^\|.*\|$/)) {
+      exprs.push(["diamond", part.substr(1, part.length - 2).trim()]);
+    } else if (/^\|.*\|$/.test(part)) {
       // bar
-      part = part.substr(1, part.length - 2);
-      exprs.push(["mrecord", part]);
-    } else if (part.match(/->$/)) {
+      exprs.push(["mrecord", part.substr(1, part.length - 2).trim()]);
+    } else if (/->$/.test(part)) {
       // arrow
-      part = part.substr(0, part.length - 2).trim();
-      exprs.push(["edge", "none", "vee", part, "solid"]);
+      exprs.push([
+        "edge",
+        "none",
+        "vee",
+        part.substr(0, part.length - 2).trim(),
+        "solid",
+      ]);
     } else if (part === "-") {
       // connector for notes
       exprs.push(["edge", "none", "none", "", "solid"]);
@@ -67,23 +69,27 @@ function parseYumlExpr(specLine) {
 
 function composeDotExpr(specLines, options) {
   let node;
-  let uid;
-  let label;
   const uids = {};
   let len = 0;
   const elements = [];
   const headports = { LR: "w", RL: "e", TB: "n" };
+  const getUID = (uids, label) => {
+    const recordNameLabel = recordName(label);
+
+    return (
+      !uids.hasOwnProperty(recordNameLabel) &&
+      (uids[recordNameLabel] = "A" + len++)
+    );
+  };
 
   for (let i = 0; i < specLines.length; i++) {
     const elem = parseYumlExpr(specLines[i]);
 
     for (let k = 0; k < elem.length; k++) {
       if (elem[k][0] === "note" || elem[k][0] === "record") {
-        label = elem[k][1];
-        if (uids.hasOwnProperty(recordName(label))) continue;
-
-        uid = "A" + (len++).toString();
-        uids[recordName(label)] = uid;
+        const label = elem[k][1];
+        const uid = getUID(uids, label);
+        if (!uid) continue;
 
         if (elem[k][0] === "record" && (label === "start" || label === "end")) {
           node = {
@@ -116,11 +122,9 @@ function composeDotExpr(specLines, options) {
 
         elements.push([uid, node]);
       } else if (elem[k][0] === "diamond") {
-        label = elem[k][1];
-        if (uids.hasOwnProperty(recordName(label))) continue;
-
-        uid = "A" + (len++).toString();
-        uids[recordName(label)] = uid;
+        const label = elem[k][1];
+        const uid = getUID(uids, label);
+        if (!uid) continue;
 
         node = {
           shape: "diamond",
@@ -132,11 +136,9 @@ function composeDotExpr(specLines, options) {
 
         elements.push([uid, node]);
       } else if (elem[k][0] === "mrecord") {
-        label = elem[k][1];
-        if (uids.hasOwnProperty(recordName(label))) continue;
-
-        uid = "A" + (len++).toString();
-        uids[recordName(label)] = uid;
+        const label = elem[k][1];
+        const uid = getUID(uids, label);
+        if (!uid) continue;
 
         node = {
           shape: "record",
@@ -167,7 +169,7 @@ function composeDotExpr(specLines, options) {
         const edge = {
           shape: "edge",
           dir: "both",
-          style: style,
+          style,
           arrowtail: elem[k][1],
           arrowhead: elem[k][2],
           labeldistance: 1,
@@ -189,11 +191,9 @@ function composeDotExpr(specLines, options) {
     }
   }
 
-  let dot = `    ranksep = ${RANKSEP}\n`;
-  dot += "    rankdir = " + options.dir + "\n";
-  dot += serializeDotElements(elements);
-  dot += "}\n";
-  return dot;
+  return `\tranksep= ${RANKSEP}\n\trankdir= ${
+    options.dir
+  }\n${serializeDotElements(elements)}}\n`;
 }
 
 function addBarFacet(elements, name) {
