@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.0.1
+
+* Fix some broken features on class and activity diagrams
+
 ## 4.0.0
 
 * The API is now promisified due to `Viz.js` v2
@@ -11,7 +15,7 @@
   message.
 * Lazy load rendering modules to improve startup time
 
-# 3.1
+## 3.1
 
 * Expose `options` object to the API
 
