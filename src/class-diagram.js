@@ -34,7 +34,7 @@ function parseYumlExpr(specLine) {
   const parts = splitYumlExpr(specLine, "[");
 
   for (const part of parts) {
-    if (/^[.*]$/.test(part)) {
+    if (/^\[.*\]$/.test(part)) {
       // class box
       const ret = extractBgAndNote(part.substr(1, part.length - 2), true);
       exprs.push([
@@ -46,12 +46,12 @@ function parseYumlExpr(specLine) {
     } else if (part === "^") {
       // inheritance
       exprs.push(["edge", "empty", "", "none", "", "solid"]);
-    } else if (part.indexOf("-") >= 0) {
+    } else if (part.includes("-")) {
       // association
       let style;
       let tokens;
 
-      if (part.indexOf("-.-") >= 0) {
+      if (part.includes("-.-")) {
         style = "dashed";
         tokens = part.split("-.-");
       } else {
