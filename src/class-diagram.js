@@ -3,10 +3,10 @@
 const {
   extractBgAndNote,
   formatLabel,
-  recordName,
   serializeDot,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const UIDHandler = require("./uidHandler");
 const Color = require("color");
 
 const RANKSEP = 0.7;
@@ -102,89 +102,74 @@ function parseYumlExpr(specLine) {
 }
 
 function composeDotExpr(specLines, options) {
-  let style;
-  let uid;
-  const uids = {};
-  let len = 0;
-  let dot = `    ranksep = ${RANKSEP}\n`;
-  dot += "    rankdir = " + options.dir + "\n";
+  const uidHandler = new UIDHandler();
 
-  for (let i = 0; i < specLines.length; i++) {
-    const elem = parseYumlExpr(specLines[i]);
+  let dot = "";
 
-    for (let k = 0; k < elem.length; k++) {
-      if (elem[k][0] === "note" || elem[k][0] === "record") {
+  for (const line of specLines) {
+    const parsedYumlExpr = parseYumlExpr(line);
+
+    for (const elem of parsedYumlExpr) {
+      const [shape] = elem;
+      if (shape === "note" || shape === "record") {
         const label = elem[k][1];
-        if (uids.hasOwnProperty(recordName(label))) continue;
-
-        uid = "A" + (len++).toString();
-        uids[recordName(label)] = uid;
+        const uid = uidHandler.createUid(label);
+        if (!uid) continue;
 
         const node = {
-          shape: elem[k][0],
+          shape,
           height: 0.5,
           fontsize: 10,
           margin: "0.20,0.05",
           label: formatLabel(label, 20, true),
         };
 
-        if (elem[k][2]) {
-          const color = Color(elem[k][2]);
+        if (elem[2]) {
+          const color = Color(elem[2]);
 
           node.style = "filled";
           node.fillcolor = color.hex();
           node.fontcolor = color.isDark() ? "white" : "black";
         }
 
-        if (elem[k][3]) node.fontcolor = elem[k][3];
+        if (elem[3]) {
+          node.fontcolor = elem[3];
+        }
 
-        dot += "    " + uid + " " + serializeDot(node) + "\n";
+        dot += `\t${uid} ${serializeDot(node)}\n`;
       }
     }
 
-    if (elem.length === 3 && elem[1][0] === "edge") {
-      const hasNote = elem[0][0] === "note" || elem[2][0] === "note";
-      style = hasNote ? "dashed" : elem[1][5];
+    if (parsedYumlExpr.length === 3 && parsedYumlExpr[1][0] === "edge") {
+      const hasNote =
+        parsedYumlExpr[0][0] === "note" || parsedYumlExpr[2][0] === "note";
 
       const edge = {
         shape: "edge",
         dir: "both",
-        style,
-        arrowtail: elem[1][1],
-        taillabel: elem[1][2],
-        arrowhead: elem[1][3],
-        headlabel: elem[1][4],
+        style: hasNote ? "dashed" : parsedYumlExpr[1][5],
+        arrowtail: parsedYumlExpr[1][1],
+        taillabel: parsedYumlExpr[1][2],
+        arrowhead: parsedYumlExpr[1][3],
+        headlabel: parsedYumlExpr[1][4],
         labeldistance: 2,
         fontsize: 10,
       };
 
-      if (hasNote)
-        dot +=
-          "    { rank=same; " +
-          uids[recordName(elem[0][1])] +
-          " -> " +
-          uids[recordName(elem[2][1])] +
-          " " +
-          serializeDot(edge) +
-          ";}\n";
-      else
-        dot +=
-          "    " +
-          uids[recordName(elem[0][1])] +
-          " -> " +
-          uids[recordName(elem[2][1])] +
-          " " +
-          serializeDot(edge) +
-          "\n";
+      const dotEdge = `${uidHandler.getUid(
+        parsedYumlExpr[0][1]
+      )} -> ${uidHandler.getUid(parsedYumlExpr[2][1])} ${serializeDot(edge)}`;
+
+      dot += hasNode ? `\t{rank=same;${dotEdge};}\n` : `\t${dotEdge}\n`;
     } else if (
-      elem.length === 4 &&
-      elem[0][0] === "record" &&
-      elem[1][0] === "edge" &&
-      elem[2][0] === "record" &&
-      elem[3][0] === "record"
+      parsedYumlExpr.length === 4 &&
+      parsedYumlExpr[0][0] === "record" &&
+      parsedYumlExpr[1][0] === "edge" &&
+      parsedYumlExpr[2][0] === "record" &&
+      parsedYumlExpr[3][0] === "record"
     ) {
       // intermediate association class
-      style = elem[1][5];
+      const style = parsedYumlExpr[1][5];
 
       const junction = {
         shape: "point",
@@ -193,15 +178,13 @@ function composeDotExpr(specLines, options) {
         height: 0.01,
         width: 0.01,
       };
-      uid = uids[recordName(elem[0][1])] + "J" + uids[recordName(elem[2][1])];
-      dot += "    " + uid + " " + serializeDot(junction) + "\n";
 
       const edge1 = {
         shape: "edge",
         dir: "both",
-        style: style,
-        arrowtail: elem[1][1],
-        taillabel: elem[1][2],
+        style,
+        arrowtail: parsedYumlExpr[1][1],
+        taillabel: parsedYumlExpr[1][2],
         arrowhead: "none",
         labeldistance: 2,
         fontsize: 10,
@@ -209,10 +192,10 @@ function composeDotExpr(specLines, options) {
       const edge2 = {
         shape: "edge",
         dir: "both",
-        style: style,
+        style,
         arrowtail: "none",
-        arrowhead: elem[1][3],
-        headlabel: elem[1][4],
+        arrowhead: parsedYumlExpr[1][3],
+        headlabel: parsedYumlExpr[1][4],
         labeldistance: 2,
         fontsize: 10,
       };
@@ -224,35 +207,23 @@ function composeDotExpr(specLines, options) {
         arrowhead: "vee",
         labeldistance: 2,
       };
-      dot +=
-        "    " +
-        uids[recordName(elem[0][1])] +
-        " -> " +
-        uid +
-        " " +
-        serializeDot(edge1) +
-        "\n";
-      dot +=
-        "    " +
-        uid +
-        " -> " +
-        uids[recordName(elem[2][1])] +
-        " " +
-        serializeDot(edge2) +
-        "\n";
-      dot +=
-        "    { rank=same; " +
-        uids[recordName(elem[3][1])] +
-        " -> " +
-        uid +
-        " " +
-        serializeDot(edge3) +
-        ";}\n";
+
+      const uid =
+        uidHandler.getUid(parsedYumlExpr[0][1]) +
+        "J" +
+        uidHandler.getUid(parsedYumlExpr[2][1]);
+
+      dot += `\t${uid} ${serializeDot(junction)}\n\t${uidHandler.getUid(
+        parsedYumlExpr[0][1]
+      )} -> ${uid} ${serializeDot(edge1)}\n\t${uid} -> ${uidHandler.getUid(
+        parsedYumlExpr[2][1]
+      )} ${serializeDot(edge2)}\n\t{rank=same;${uidHandler.getUid(
+        parsedYumlExpr[3][1]
+      )} -> ${uid} ${serializeDot(edge3)};}\n`;
     }
   }
 
-  dot += "}\n";
-  return dot;
+  return `\tranksep= ${RANKSEP}\n\trankdir= ${options.dir}\n${dot}`;
 }
 
 module.exports = composeDotExpr;

@@ -3,9 +3,9 @@
 const {
   extractBgAndNote,
   formatLabel,
-  recordName,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const UIDHandler = require("./uidHandler");
 const Renderer = require("./sequence-renderer.js");
 
 /*
@@ -29,11 +29,8 @@ function parseYumlExpr(specLine) {
   const exprs = [];
   const parts = splitYumlExpr(specLine, "[");
 
-  for (let i = 0; i < parts.length; i++) {
-    let part = parts[i].trim();
-    if (part.length === 0) continue;
-
-    if (part.match(/^\[.*\]$/)) {
+  for (const part of parts) {
+    if (/^\[.*\]$/.test(part)) {
       // object
       part = part.substr(1, part.length - 2);
       const ret = extractBgAndNote(part, true);
@@ -43,34 +40,32 @@ function parseYumlExpr(specLine) {
         ret.bg,
         ret.fontcolor,
       ]);
-    } else if (part.indexOf(">") >= 0) {
+    } else if (part.includes(">")) {
       // message
-      let style = part.indexOf(".>") >= 0 ? "dashed" : "solid";
-      style = part.indexOf(">>") >= 0 ? "async" : style;
+      const style = part.includes(">>")
+        ? "async"
+        : part.includes(".>")
+          ? "dashed"
+          : "solid";
 
-      let prefix = "";
-      if (part.startsWith("(") || part.startsWith(")")) {
-        prefix = part.substr(0, 1);
-        part = part.substr(1);
-      }
+      const prefix =
+        part.startsWith("(") || part.startsWith(")") ? part.charAt(0) : "";
 
-      let message = "";
-      const pos = part.match(/[\.|>]{0,1}>[\(|\)]{0,1}$/);
+      const pos = part.match(/[\.|>]?>[\(|\)]?$/);
       if (pos === null) {
         throw new Error("Invalid expression");
-      } else if (pos.index > 0) {
-        message = part.substr(0, pos.index);
-        part = part.substr(pos.index);
       }
+      const message = pos.index > 0 ? part.substr(0, pos.index) : "";
 
-      let suffix = "";
-      if (part.endsWith("(") || part.endsWith(")")) {
-        suffix = part.charAt(part.length - 1);
-        part = part.substr(0, part.length - 1);
-      }
+      let suffix =
+        part.endsWith("(") || part.endsWith(")")
+          ? part.charAt(part.length - 1)
+          : "";
 
       exprs.push(["signal", prefix, message, style, suffix]);
-    } else throw new Error("Invalid expression");
+    } else {
+      throw new Error("Invalid expression");
+    }
   }
 
   return exprs;
@@ -80,38 +75,40 @@ function composeSVG(specLines, options) {
   const actors = [];
   const signals = [];
 
-  const uids = {};
-  for (let i = 0; i < specLines.length; i++) {
-    const elem = parseYumlExpr(specLines[i]);
+  const uidHandler = new UIDHandler();
 
-    for (let k = 0; k < elem.length; k++) {
-      const type = elem[k][0];
+  for (const line of specLines) {
+    const parsedYumlExpr = parseYumlExpr(line);
+    const parsedYumlExprLastIndex = parsedYumlExpr.length - 1;
+
+    for (const elem of parsedYumlExpr) {
+      const [type, label] = elem;
 
       if (type === "object") {
-        let label = elem[k][1];
-        const name = recordName(label);
-        if (name in uids) continue;
+        uidHandler.createUid(label, name => {
+          const actor = {
+            type,
+            name,
+            label: formatLabel(label, 20, true),
+            index: actors.length,
+          };
 
-        label = formatLabel(label, 20, true);
-        const actor = {
-          type: elem[k][0],
-          name,
-          label,
-          index: actors.length,
-        };
-        uids[name] = actor;
+          actors.push(actor);
 
-        actors.push(actor);
+          return actor;
+        });
       }
     }
 
     const isValidElem =
-      elem.length === 3 && elem[0][0] === "object" && elem[1][0] === "signal";
+      parsedYumlExpr.length === 3 &&
+      parsedYumlExpr[0][0] === "object" &&
+      parsedYumlExpr[1][0] === "signal";
 
-    if (isValidElem && elem[2][0] === "object") {
-      const [_, __, message, style] = elem[1];
-      const actorA = uids[recordName(elem[0][1])];
-      const actorB = uids[recordName(elem[2][1])];
+    if (isValidElem && parsedYumlExpr[2][0] === "object") {
+      const [_, __, message, style] = parsedYumlExpr[1];
+      const actorA = uidHandler.getUid(parsedYumlExpr[0][1]);
+      const actorB = uidHandler.getUid(parsedYumlExpr[2][1]);
 
       switch (style) {
         case "dashed":
@@ -147,23 +144,28 @@ function composeSVG(specLines, options) {
 
         default:
       }
-    } else if (isValidElem && elem[2][0] === "note") {
-      const actor = uids[recordName(elem[0][1])];
-      const message = formatLabel(elem[2][1], 20, true);
+    } else if (isValidElem && parsedYumlExpr[2][0] === "note") {
+      const actor = uidHandler.getUid(parsedYumlExpr[0][1]);
+      const message = formatLabel(parsedYumlExpr[2][1], 20, true);
       const note = { type: "note", message, actor };
 
-      if (elem[2][2])
+      if (parsedYumlExpr[2][2])
         // background color
-        note.bgcolor = elem[2][2];
-      if (elem[2][3])
+        note.bgcolor = parsedYumlExpr[2][2];
+      if (parsedYumlExpr[2][3])
         // font color
-        note.fontcolor = elem[2][3];
+        note.fontcolor = parsedYumlExpr[2][3];
 
       signals.push(note);
     }
   }
 
-  const renderer = new Renderer(actors, signals, uids, options.isDark);
+  const renderer = new Renderer(
+    actors,
+    signals,
+    uidHandler._uids,
+    options.isDark
+  );
   return renderer.svg_.serialize();
 }
 

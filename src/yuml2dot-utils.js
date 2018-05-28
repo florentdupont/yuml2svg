@@ -185,16 +185,7 @@ const serializeDotElements = function(arr) {
   return dot;
 };
 
-const buildDotHeader = isDark => `digraph G{
-    graph[fontname=Helvetica${isDark ? ",bgcolor=transparent" : ""}]
-    node[shape=none,margin=0,fontname=Helvetica${
-      isDark ? ",color=white,fontcolor=white" : ""
-    }]
-    edge[fontname=Helvetica${isDark ? ",color=white,fontcolor=white" : ""}]
-  `;
-
 module.exports = {
-  buildDotHeader,
   escape_label,
   escape_token_escapes,
   extractBgAndNote,

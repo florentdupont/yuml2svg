@@ -95,9 +95,9 @@ const processYumlData = (
       if (options.type === "sequence") {
         return Promise.resolve(rendered);
       } else {
-        const { buildDotHeader } = require("./yuml2dot-utils");
+        const wrapDotDocument = require("./wrapDotDocument");
         return require(dot2svg)(
-          buildDotHeader(isDark) + rendered,
+          wrapDotDocument(rendered, isDark),
           vizOptions,
           renderOptions
         ).then(svg => require(processEmbeddedImages)(svg, isDark));

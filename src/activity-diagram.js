@@ -3,13 +3,15 @@
 const {
   escape_label,
   extractBgAndNote,
-  recordName,
   serializeDotElements,
   splitYumlExpr,
 } = require("./yuml2dot-utils.js");
+const UIDHandler = require("./uidHandler");
+
 const Color = require("color");
 
 const RANKSEP = 0.5;
+const HEADPORTS = { LR: "w", RL: "e", TB: "n" };
 
 /*
 Syntax as specified in yuml.me
@@ -69,29 +71,21 @@ function parseYumlExpr(specLine) {
 
 function composeDotExpr(specLines, options) {
   let node;
-  const uids = {};
-  let len = 0;
+  const uidHandler = new UIDHandler();
   const elements = [];
-  const headports = { LR: "w", RL: "e", TB: "n" };
-  const getUID = (uids, label) => {
-    const recordNameLabel = recordName(label);
 
-    return (
-      !uids.hasOwnProperty(recordNameLabel) &&
-      (uids[recordNameLabel] = "A" + len++)
-    );
-  };
+  for (const line of specLines) {
+    const parsedYumlExpr = parseYumlExpr(line);
+    const parsedYumlExprLastIndex = parsedYumlExpr.length - 1;
 
-  for (let i = 0; i < specLines.length; i++) {
-    const elem = parseYumlExpr(specLines[i]);
+    for (const elem of parsedYumlExpr) {
+      const [shape, label] = elem;
 
-    for (let k = 0; k < elem.length; k++) {
-      if (elem[k][0] === "note" || elem[k][0] === "record") {
-        const label = elem[k][1];
-        const uid = getUID(uids, label);
+      if (shape === "note" || shape === "record") {
+        const uid = uidHandler.createUid(label);
         if (!uid) continue;
 
-        if (elem[k][0] === "record" && (label === "start" || label === "end")) {
+        if (shape === "record" && (label === "start" || label === "end")) {
           node = {
             shape: label === "start" ? "circle" : "doublecircle",
             height: 0.3,
@@ -101,7 +95,7 @@ function composeDotExpr(specLines, options) {
           };
         } else {
           node = {
-            shape: elem[k][0],
+            shape,
             height: 0.5,
             fontsize: 10,
             margin: "0.20,0.05",
@@ -109,21 +103,20 @@ function composeDotExpr(specLines, options) {
             style: "rounded",
           };
 
-          if (elem[k][2]) {
-            const color = Color(elem[k][2]);
+          if (elem[2]) {
+            const color = Color(elem[2]);
 
             node.style += ",filled";
             node.fillcolor = color.hex();
             node.fontcolor = color.isDark() ? "white" : "black";
           }
 
-          if (elem[k][3]) node.fontcolor = elem[k][3];
+          if (elem[3]) node.fontcolor = elem[3];
         }
 
         elements.push([uid, node]);
-      } else if (elem[k][0] === "diamond") {
-        const label = elem[k][1];
-        const uid = getUID(uids, label);
+      } else if (shape === "diamond") {
+        const uid = uidHandler.createUid(label);
         if (!uid) continue;
 
         node = {
@@ -135,9 +128,8 @@ function composeDotExpr(specLines, options) {
         };
 
         elements.push([uid, node]);
-      } else if (elem[k][0] === "mrecord") {
-        const label = elem[k][1];
-        const uid = getUID(uids, label);
+      } else if (shape === "mrecord") {
+        const uid = uidHandler.createUid(label);
         if (!uid) continue;
 
         node = {
@@ -155,57 +147,65 @@ function composeDotExpr(specLines, options) {
       }
     }
 
-    for (let k = 1; k < elem.length - 1; k++) {
+    for (let k = 1; k < parsedYumlExprLastIndex; k++) {
       if (
-        elem[k][0] === "edge" &&
-        elem[k - 1][0] !== "edge" &&
-        elem[k + 1][0] !== "edge"
+        parsedYumlExpr[k][0] === "edge" &&
+        parsedYumlExpr[k - 1][0] !== "edge" &&
+        parsedYumlExpr[k + 1][0] !== "edge"
       ) {
         const style =
-          elem[k - 1][0] === "note" || elem[k + 1][0] === "note"
+          parsedYumlExpr[k - 1][0] === "note" ||
+          parsedYumlExpr[k + 1][0] === "note"
             ? "dashed"
-            : elem[k][4];
+            : parsedYumlExpr[k][4];
 
         const edge = {
           shape: "edge",
           dir: "both",
           style,
-          arrowtail: elem[k][1],
-          arrowhead: elem[k][2],
+          arrowtail: parsedYumlExpr[k][1],
+          arrowhead: parsedYumlExpr[k][2],
           labeldistance: 1,
           fontsize: 10,
         };
 
-        if (elem[k][3].length > 0) edge.label = elem[k][3];
+        const element = [
+          uidHandler.getUid(parsedYumlExpr[k - 1][1]),
+          uidHandler.getUid(parsedYumlExpr[k + 1][1]),
+          edge,
+        ];
 
-        const uid1 = uids[recordName(elem[k - 1][1])];
-        let uid2 = uids[recordName(elem[k + 1][1])];
-
-        if (elem[k + 1][0] === "mrecord") {
-          const facet = addBarFacet(elements, uid2);
-          uid2 += ":" + facet + ":" + headports[options.dir];
+        if (parsedYumlExpr[k][3].length > 0) {
+          edge.label = parsedYumlExpr[k][3];
         }
 
-        elements.push([uid1, uid2, edge]);
+        if (parsedYumlExpr[k + 1][0] === "mrecord") {
+          element[1] += `:${addBarFacet(elements, element[1])}:${
+            HEADPORTS[options.dir]
+          }`;
+        }
+
+        elements.push(element);
       }
     }
   }
 
   return `\tranksep= ${RANKSEP}\n\trankdir= ${
     options.dir
-  }\n${serializeDotElements(elements)}}\n`;
+  }\n${serializeDotElements(elements)}`;
 }
 
 function addBarFacet(elements, name) {
-  for (let i = 0; i < elements.length; i++) {
-    if (elements[i].length === 2 && elements[i][0] === name) {
-      const node = elements[i][1];
-      let facetNum = 1;
+  for (const elem of elements) {
+    if (elem.length === 2 && elem[0] === name) {
+      const node = elem[1];
+      const facetNum = (node.label.match(/|/g) || []).length + 1;
 
-      if (node.label.length > 0) {
-        facetNum = node.label.split("|").length + 1;
-        node.label += "|<f" + facetNum + ">";
-      } else node.label = "<f1>";
+      if (node.label.length) {
+        node.label += `|<f${facetNum}>`;
+      } else {
+        node.label = "<f1>";
+      }
 
       return "f" + facetNum;
     }
