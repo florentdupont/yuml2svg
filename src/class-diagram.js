@@ -29,23 +29,17 @@ Color splash    [Customer{bg:orange}]<>1->*[Order{bg:green}]
 Comment         // Comments
 */
 
-function parseYumlExpr(specLine) {
-  const exprs = [];
+function* parseYumlExpr(specLine) {
   const parts = splitYumlExpr(specLine, "[");
 
   for (const part of parts) {
     if (/^\[.*\]$/.test(part)) {
       // class box
       const ret = extractBgAndNote(part.substr(1, part.length - 2), true);
-      exprs.push([
-        ret.isNote ? "note" : "record",
-        ret.part,
-        ret.bg,
-        ret.fontcolor,
-      ]);
+      yield [ret.isNote ? "note" : "record", ret.part, ret.bg, ret.fontcolor];
     } else if (part === "^") {
       // inheritance
-      exprs.push(["edge", "empty", "", "none", "", "solid"]);
+      yield ["edge", "empty", "", "none", "", "solid"];
     } else if (part.includes("-")) {
       // association
       let style;
@@ -94,11 +88,11 @@ function parseYumlExpr(specLine) {
 
       const [rightStyle, rightText] = processRight(right);
 
-      exprs.push(["edge", leftStyle, leftText, rightStyle, rightText, style]);
-    } else throw new Error(`Invalid expression - ${part}.`);
+      yield ["edge", leftStyle, leftText, rightStyle, rightText, style];
+    } else {
+      throw new Error(`Invalid expression - ${part}.`);
+    }
   }
-
-  return exprs;
 }
 
 function composeDotExpr(specLines, options) {
@@ -107,12 +101,12 @@ function composeDotExpr(specLines, options) {
   let dot = "";
 
   for (const line of specLines) {
-    const parsedYumlExpr = parseYumlExpr(line);
+    const parsedYumlExpr = [];
+    let mightBeEdgy = true;
 
-    for (const elem of parsedYumlExpr) {
-      const [shape] = elem;
+    for (const elem of parseYumlExpr(line)) {
+      const [shape, label] = elem;
       if (shape === "note" || shape === "record") {
-        const label = elem[k][1];
         const uid = uidHandler.createUid(label);
         if (!uid) continue;
 
@@ -138,9 +132,17 @@ function composeDotExpr(specLines, options) {
 
         dot += `\t${uid} ${serializeDot(node)}\n`;
       }
+
+      if (mightBeEdgy) {
+        // In case the yUML expression is an edge between two notes/classes
+        // or a junction of three classes
+        const parsedLength = parsedYumlExpr.push(elem);
+        mightBeEdgy =
+          parsedLength < 5 && (parsedLength !== 2 || elem[0] === "edge");
+      }
     }
 
-    if (parsedYumlExpr.length === 3 && parsedYumlExpr[1][0] === "edge") {
+    if (mightBeEdgy && parsedYumlExpr.length === 3) {
       const hasNote =
         parsedYumlExpr[0][0] === "note" || parsedYumlExpr[2][0] === "note";
 
@@ -160,11 +162,11 @@ function composeDotExpr(specLines, options) {
         parsedYumlExpr[0][1]
       )} -> ${uidHandler.getUid(parsedYumlExpr[2][1])} ${serializeDot(edge)}`;
 
-      dot += hasNode ? `\t{rank=same;${dotEdge};}\n` : `\t${dotEdge}\n`;
+      dot += hasNote ? `\t{rank=same;${dotEdge};}\n` : `\t${dotEdge}\n`;
     } else if (
+      mightBeEdgy &&
       parsedYumlExpr.length === 4 &&
       parsedYumlExpr[0][0] === "record" &&
-      parsedYumlExpr[1][0] === "edge" &&
       parsedYumlExpr[2][0] === "record" &&
       parsedYumlExpr[3][0] === "record"
     ) {

@@ -20,7 +20,7 @@ const escape_label = function(label) {
   return newLabel;
 };
 
-const splitYumlExpr = function(line, separators, escape = "\\") {
+const splitYumlExpr = function*(line, separators, escape = "\\") {
   const SEPARATOR_END = {
     "[": "]",
     "<": ">",
@@ -30,32 +30,33 @@ const splitYumlExpr = function(line, separators, escape = "\\") {
 
   let word = "";
   let lastChar;
-  const parts = [];
 
-  for (let i = 0; i < line.length; i++) {
-    const currentChar = line[i];
+  const lineLength = line.length;
 
-    if (currentChar === escape && i + 1 < line.length) {
-      word += currentChar + line[++i];
+  for (let i = 0; i < lineLength; i++) {
+    const currentChar = line.charAt(i);
+
+    if (currentChar === escape && i + 1 < lineLength) {
+      word += currentChar + line.charAt(++i);
     } else if (separators.includes(currentChar) && lastChar === undefined) {
       if (word.length > 0) {
-        parts.push(word.trim());
+        yield word.trim();
       }
 
       lastChar = SEPARATOR_END[currentChar];
       word = currentChar;
     } else if (currentChar === lastChar) {
       lastChar = undefined;
-      parts.push(word.trim() + currentChar);
+      yield word.trim() + currentChar;
       word = "";
     } else {
       word += currentChar;
     }
   }
 
-  if (word.length > 0) parts.push(word.trim());
-
-  return parts;
+  if (word.length > 0) {
+    yield word.trim();
+  }
 };
 
 const extractBgAndNote = function(part, allowNote) {
@@ -172,14 +173,14 @@ const serializeDot = function(node) {
   );
 };
 
-const serializeDotElements = function(arr) {
+const serializeDotElements = function(iterator) {
   let dot = "";
 
-  for (const record of arr) {
+  for (const record of iterator) {
     if (record.length === 2)
-      dot += `    ${record[0]} ${serializeDot(record[1])}\n`;
+      dot += `\t${record[0]} ${serializeDot(record[1])}\n`;
     else if (record.length === 3)
-      dot += `    ${record[0]} -> ${record[1]} ${serializeDot(record[2])}\n`;
+      dot += `\t${record[0]} -> ${record[1]} ${serializeDot(record[2])}\n`;
   }
 
   return dot;
