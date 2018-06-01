@@ -12,23 +12,14 @@
   "bugs": {
     "url": "https://github.com/aduh95/vscode-yuml/issues"
   },
-  "homepage": "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
+  "homepage":
+    "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=10.0.0"
   },
-  "categories": [
-    "Languages",
-    "Snippets",
-    "Other"
-  ],
-  "keywords": [
-    "yuml",
-    "uml",
-    "diagram",
-    "sequence",
-    "markdown"
-  ],
-  "main": "./index.js",
+  "categories": ["Languages", "Snippets", "Other"],
+  "keywords": ["yuml", "uml", "diagram", "sequence", "markdown"],
+  "main": "./index.mjs",
   "bin": {
     "yuml2svg": "bin/yuml2svg.js"
   },
