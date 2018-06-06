@@ -32,8 +32,7 @@ function parseYumlExpr(specLine) {
   for (const part of parts) {
     if (/^\[.*\]$/.test(part)) {
       // object
-      part = part.substr(1, part.length - 2);
-      const ret = extractBgAndNote(part, true);
+      const ret = extractBgAndNote(part.substr(1, part.length - 2), true);
       exprs.push([
         ret.isNote ? "note" : "object",
         ret.part,
