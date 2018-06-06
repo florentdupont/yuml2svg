@@ -6,8 +6,7 @@ const escape_label = function(label) {
   const ESCAPED_CHARS = {
     "{": "\\{",
     "}": "\\}",
-    ";": "\\n",
-    " ": "\\ ",
+    ";": "\n",
     "<": "\\<",
     ">": "\\>",
   };
@@ -98,7 +97,7 @@ const formatLabel = function(label, wrap, allowDivisors) {
     allowDivisors && label.includes(DIVISOR) ? label.split(DIVISOR) : [label];
 
   return escape_label(
-    lines.map(line => wordwrap(line, wrap, "\\n")).join(DIVISOR)
+    lines.map(line => wordwrap(line, wrap, "\n")).join(DIVISOR)
   );
 };
 
@@ -128,7 +127,7 @@ const serializeDot = function(node) {
 
     if (node.label.includes("|")) {
       const ESCAPED_CHARS = {
-        "\\n": "<BR/>",
+        "\n": "<BR/>",
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
