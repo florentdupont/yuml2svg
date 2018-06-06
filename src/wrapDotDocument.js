@@ -1,3 +1,5 @@
+"use strict";
+
 const buildDotHeader = isDark =>
   `graph[fontname=Helvetica${isDark ? ",bgcolor=transparent" : ""}]
     node[shape=none,margin=0,fontname=Helvetica${
