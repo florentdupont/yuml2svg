@@ -6,7 +6,7 @@ const {
   recordName,
   serializeDot,
   splitYumlExpr,
-} = require("./yuml2dot-utils.js");
+} = require("./yuml2dot-utils");
 const UIDHandler = require("./uidHandler");
 const Color = require("color");
 

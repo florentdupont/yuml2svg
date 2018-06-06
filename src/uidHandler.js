@@ -1,6 +1,6 @@
 "use strict";
 
-const { recordName } = require("./yuml2dot-utils.js");
+const { recordName } = require("./yuml2dot-utils");
 
 module.exports = class {
   constructor() {

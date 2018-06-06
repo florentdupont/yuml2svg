@@ -4,9 +4,9 @@ const {
   extractBgAndNote,
   formatLabel,
   splitYumlExpr,
-} = require("./yuml2dot-utils.js");
+} = require("./yuml2dot-utils");
 const UIDHandler = require("./uidHandler");
-const Renderer = require("./sequence-renderer.js");
+const Renderer = require("./sequence-renderer");
 
 /*
 Unofficial syntax, based on a proposal specified in the Scruffy project, plus local additions

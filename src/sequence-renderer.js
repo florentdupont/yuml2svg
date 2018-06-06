@@ -1,6 +1,6 @@
 "use strict";
 
-const svg_builder = require("./svg-builder.js");
+const svg_builder = require("./svg-builder");
 
 /*
 Rendering algorithms based on:
