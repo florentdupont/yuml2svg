@@ -42,21 +42,13 @@ function* parseYumlExpr(specLine) {
       yield ["edge", "empty", "", "none", "", "solid"];
     } else if (part.includes("-")) {
       // association
-      let style;
-      let tokens;
+      const isDashed = part.includes("-.-");
+      const style = isDashed ? "dashed" : "solid";
+      const [left, right] = part.split(isDashed ? "-.-" : "-", 2);
 
-      if (part.includes("-.-")) {
-        style = "dashed";
-        tokens = part.split("-.-");
-      } else {
-        style = "solid";
-        tokens = part.split("-");
+      if (left === undefined || right === undefined) {
+        throw new Error(`Invalid expression - "${part}".`);
       }
-
-      if (tokens.length !== 2)
-        throw new Error(`Invalid expression - ${JSON.stringify(tokens)}.`);
-
-      const [left, right] = tokens;
 
       const processLeft = function(left) {
         if (left.startsWith("<>")) return ["odiamond", left.substring(2)];
@@ -106,6 +98,15 @@ function composeDotExpr(specLines, options) {
 
     for (const elem of parseYumlExpr(line)) {
       const [shape, label] = elem;
+
+      if (mightBeEdgy) {
+        // In case the yUML expression is an edge between two notes/classes
+        // or a junction of three classes
+        const parsedLength = parsedYumlExpr.push(elem);
+        mightBeEdgy =
+          parsedLength < 5 && (parsedLength !== 2 || shape === "edge");
+      }
+
       if (shape === "note" || shape === "record") {
         const uid = uidHandler.createUid(label);
         if (!uid) continue;
@@ -131,14 +132,6 @@ function composeDotExpr(specLines, options) {
         }
 
         dot += `\t${uid} ${serializeDot(node)}\n`;
-      }
-
-      if (mightBeEdgy) {
-        // In case the yUML expression is an edge between two notes/classes
-        // or a junction of three classes
-        const parsedLength = parsedYumlExpr.push(elem);
-        mightBeEdgy =
-          parsedLength < 5 && (parsedLength !== 2 || elem[0] === "edge");
       }
     }
 
