@@ -1,11 +1,31 @@
 "use strict";
 
-const buildDotHeader = isDark =>
-  `graph[fontname=Helvetica${isDark ? ",bgcolor=transparent" : ""}]
-    node[shape=none,margin=0,fontname=Helvetica${
-      isDark ? ",color=white,fontcolor=white" : ""
-    }]
-    edge[fontname=Helvetica${isDark ? ",color=white,fontcolor=white" : ""}]`;
+const DEFAULT_FONT = "Helvetica";
 
-module.exports = (document, isDark) =>
-  `digraph G{\n${buildDotHeader(isDark)}${document}\n}\n`;
+const DEFAULT_HEADER = {
+  graph: {},
+  node: { shape: "none", margin: 0 },
+  edge: {},
+};
+
+const DARK_HEADER = {
+  graph: { bgcolor: "transparent" },
+  node: { color: "white", fontcolor: "white" },
+  edge: { color: "white", fontcolor: "white" },
+};
+
+module.exports = (document, isDark, overrides = {}) =>
+  Object.entries(DEFAULT_HEADER).reduce(
+    (pv, [type, defaultSettings]) =>
+      `${pv}\n\t${type}[${Object.entries({
+        fontname: DEFAULT_FONT,
+        ...defaultSettings,
+        ...DARK_HEADER[isDark && type],
+        ...overrides[type],
+      })
+        .map(entry => entry.join("="))
+        .join(",")}]`,
+    "digraph G{"
+  ) +
+  document +
+  "\n}\n";

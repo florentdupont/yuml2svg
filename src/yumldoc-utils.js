@@ -3,6 +3,7 @@
 const handleStream = "./handle-stream";
 const dot2svg = "./dot2svg";
 const processEmbeddedImages = "./svg-utils";
+const wrapDotDocument = "./wrapDotDocument";
 
 const diagramTypes = {
   class: "./class-diagram",
@@ -25,8 +26,9 @@ const directions = {
  * @param {string | Buffer | Readable} input The yUML document to parse
  * @param {object} [options] - The options to be set for generating the SVG
  * @param {string} [options.dir] - The direction of the diagram "TB" (default) - topDown, "LR" - leftToRight, "RL" - rightToLeft
- * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package".
+ * @param {string} [options.type] - The type of SVG - "class" (default), "usecase", "activity", "state", "deployment", "package", "sequence".
  * @param {string} [options.isDark] - Option to get dark or light diagram
+ * @param {object} [options.dotHeaderOverrides] - Dot HEADER overrides (Not supported for Sequence diagrams)
  * @param {object} [vizOptions] - @see https://github.com/mdaines/viz.js/wiki/API#new-vizoptions (should be undefined for back-end rendering)
  * @param {string} [vizOptions.workerUrl] - URL of one of the rendering script files
  * @param {Worker} [vizOptions.worker] - Worker instance constructed with the URL or path of one of the rendering script files
@@ -85,7 +87,7 @@ const processYumlData = (
   }
 
   if (options.type in diagramTypes) {
-    const { isDark } = options;
+    const { isDark, dotHeaderOverrides } = options;
 
     try {
       const renderingFunction = require(diagramTypes[options.type]);
@@ -95,9 +97,8 @@ const processYumlData = (
       if (options.type === "sequence") {
         return Promise.resolve(rendered);
       } else {
-        const wrapDotDocument = require("./wrapDotDocument");
         return require(dot2svg)(
-          wrapDotDocument(rendered, isDark),
+          require(wrapDotDocument)(rendered, isDark, dotHeaderOverrides),
           vizOptions,
           renderOptions
         ).then(svg => require(processEmbeddedImages)(svg, isDark));
