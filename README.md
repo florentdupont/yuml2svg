@@ -72,8 +72,10 @@ as a `string`.
 > * `dir`: `string` The direction of the diagram "TB" (default) - topDown,
 >   "LR" - leftToRight, "RL" - rightToLeft
 > * `type`: `string` The type of SVG - "class" (default), "usecase", "activity",
->   "state", "deployment", "package".
+>   "state", "deployment", "package", "sequence".
 > * `isDark`: `boolean` Option to get dark or light diagram
+> * `dotHeaderOverrides`: `object` Option to customize output (not supported for
+>   sequence diagram)
 >
 > Please check out [Viz.js wiki](//github.com/mdaines/viz.js/wiki/2.0.0-API) to
 > get more the documentation of the last two parameters.

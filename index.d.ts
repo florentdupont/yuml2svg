@@ -1,14 +1,20 @@
-export as module yuml2svg;
+export as namespace yuml2svg;
 
 export default function yuml2svg(
   src: string,
   options?: {
     isDark?: boolean;
+    dotHeaderOverrides?: {
+      graph?: Object<string, any>;
+      node?: Object<string, any>;
+      edge?: Object<string, any>;
+    };
     type?:
       | "class"
       | "usecase"
       | "activity"
       | "state"
+      | "sequence"
       | "deployment"
       | "package";
     dir?: "TB" | "LR" | "RL";
