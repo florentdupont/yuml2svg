@@ -77,7 +77,7 @@ const processYumlData = (
   renderOptions
 ) => {
   if (diagramInstructions.length === 0) {
-    return Promise.resolve("");
+    return Promise.resolve('<svg xmlns="http://www.w3.org/2000/svg"/>');
   }
 
   if (!options.hasOwnProperty("type")) {
