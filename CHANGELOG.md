@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.1.0
+
+* Add DOT header overrides to the API to let users customize diagram appearance
+* Add TypeScript definitions
+* Fix class diagrams
+* Bug fixes and performence improvement
+
 ## 4.0.1
 
 * Fix some broken features on class and activity diagrams
