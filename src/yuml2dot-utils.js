@@ -103,7 +103,7 @@ const formatLabel = function(label, wrap, allowDivisors) {
 
 const wordwrap = function(str, width, newline) {
   if (str && str.length >= width) {
-    let p = str.lastIndexOf(" ");
+    const p = str.lastIndexOf(" ");
     if (p > 0) {
       const left = str.substring(0, p);
       const right = str.substring(p + 1);

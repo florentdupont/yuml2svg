@@ -56,7 +56,7 @@ function parseYumlExpr(specLine) {
       }
       const message = pos.index > 0 ? part.substr(0, pos.index) : "";
 
-      let suffix =
+      const suffix =
         part.endsWith("(") || part.endsWith(")")
           ? part.charAt(part.length - 1)
           : "";

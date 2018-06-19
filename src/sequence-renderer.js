@@ -251,8 +251,8 @@ module.exports = function(actors, signals, uids, isDark) {
     this.svg_.getDocument().appendChild(noteShape);
 
     // Draw text (in the center)
-    let x = getCenterX(note);
-    let y = getCenterY(note);
+    const x = getCenterX(note);
+    const y = getCenterY(note);
 
     if (note.hasOwnProperty("fontcolor"))
       this.draw_text(x, y, note.message, true, note.fontcolor);

@@ -3,31 +3,19 @@
   "displayName": "yUML to SVG",
   "description": "UML diagramming tool based on the yUML syntax",
   "version": "4.0.1",
-  "icon": "images/yUML.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aduh95/vscode-yuml"
+    "url": "https://github.com/aduh95/yuml2svg"
   },
   "bugs": {
-    "url": "https://github.com/aduh95/vscode-yuml/issues"
+    "url": "https://github.com/aduh95/yuml2svg/issues"
   },
-  "homepage": "https://github.com/jaime-olivares/vscode-yuml/blob/master/README.md",
   "engines": {
     "node": ">=6.5.0"
   },
-  "categories": [
-    "Languages",
-    "Snippets",
-    "Other"
-  ],
-  "keywords": [
-    "yuml",
-    "uml",
-    "diagram",
-    "sequence",
-    "markdown"
-  ],
+  "categories": ["Programming Languages", "Snippets", "Other"],
+  "keywords": ["yuml", "uml", "diagram", "sequence", "markdown"],
   "main": "./index.js",
   "bin": {
     "yuml2svg": "bin/yuml2svg.js"
@@ -43,7 +31,7 @@
   "devDependencies": {
     "@types/node": "^6.0.40",
     "babel-eslint": "^8.2.3",
-    "eslint": "^3.6.0",
+    "eslint": "^5.0.0-rc.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",

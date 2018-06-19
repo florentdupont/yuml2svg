@@ -6,13 +6,15 @@
     "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 2015,
-    "sourceType": "module"
+    "ecmaVersion": 2018,
+    "sourceType": "script"
   },
   "extends": ["plugin:prettier/recommended"],
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
     "eol-last": ["error", "always"],
-    "no-throw-literal": "error"
+    "no-throw-literal": "error",
+    "prefer-const": "warn",
+    "strict": ["error", "global"]
   }
 }
