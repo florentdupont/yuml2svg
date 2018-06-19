@@ -2,7 +2,7 @@
   "name": "yuml2svg",
   "displayName": "yUML to SVG",
   "description": "UML diagramming tool based on the yUML syntax",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,8 +14,18 @@
   "engines": {
     "node": ">=6.5.0"
   },
-  "categories": ["Programming Languages", "Snippets", "Other"],
-  "keywords": ["yuml", "uml", "diagram", "sequence", "markdown"],
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "yuml",
+    "uml",
+    "diagram",
+    "sequence",
+    "markdown"
+  ],
   "main": "./index.js",
   "bin": {
     "yuml2svg": "bin/yuml2svg.js"
