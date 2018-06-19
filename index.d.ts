@@ -5,9 +5,9 @@ export default function yuml2svg(
   options?: {
     isDark?: boolean;
     dotHeaderOverrides?: {
-      graph?: Object<string, any>;
-      node?: Object<string, any>;
-      edge?: Object<string, any>;
+      graph?: any;
+      node?: any;
+      edge?: any;
     };
     type?:
       | "class"
